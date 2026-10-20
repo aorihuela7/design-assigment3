@@ -10,7 +10,7 @@ export function RunwayProgress({ packed, total }: RunwayProgressProps) {
   return (
     <div className="flex items-center gap-3">
       {/* Decorative: the count beside it carries the information. */}
-      <div aria-hidden="true" className="relative h-6 flex-1">
+      <div aria-hidden="true" className="relative h-6 min-w-12 flex-1">
         <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-muted" />
         <svg
           viewBox="0 0 24 24"
@@ -24,13 +24,8 @@ export function RunwayProgress({ packed, total }: RunwayProgressProps) {
           />
         </svg>
       </div>
-      <p className="font-mono text-sm whitespace-nowrap uppercase tracking-wider text-ink">
-        <span aria-hidden="true">
-          {packed}/{total} packed
-        </span>
-        <span className="sr-only">
-          {packed} of {total} packed
-        </span>
+      <p className="font-mono text-xs whitespace-nowrap uppercase tracking-wider text-ink">
+        {packed} of {total} packed
       </p>
     </div>
   );

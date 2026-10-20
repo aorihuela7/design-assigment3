@@ -3,8 +3,8 @@
 import { useState, type ReactNode } from "react";
 import { BackLink } from "@/components/BackLink";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
-import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
+import { Button, ButtonLink } from "@/components/Button";
+import { Card, CardLink } from "@/components/Card";
 import { SelectField, TextField } from "@/components/Field";
 import { Header } from "@/components/Header";
 import { NewBadge } from "@/components/NewBadge";
@@ -111,6 +111,16 @@ export function ThemePreview() {
             <Label>Secondary, disabled</Label>
             <Button disabled>Clear all ticks</Button>
           </div>
+          <div className="flex flex-col gap-2">
+            <Label>Primary link (ButtonLink)</Label>
+            <ButtonLink variant="primary" href="/dev/theme">
+              New trip type
+            </ButtonLink>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Secondary link (ButtonLink)</Label>
+            <ButtonLink href="/dev/theme">Back to the list</ButtonLink>
+          </div>
         </div>
       </Section>
 
@@ -138,7 +148,9 @@ export function ThemePreview() {
 
       <Section title="Card">
         <Card>Static card. No hover state.</Card>
-        <Card href="/dev/theme">Link card. Hover, Tab and press it.</Card>
+        <Card interactive>
+          <CardLink href="/dev/theme">Link card.</CardLink> The link covers the whole card. Hover, Tab and press it.
+        </Card>
       </Section>
 
       <Section title="BackLink">
