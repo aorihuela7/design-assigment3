@@ -9,9 +9,8 @@ import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
 import { groupBySection, withItems } from "@/lib/trips";
 import { AddItemForm } from "./AddItemForm";
+import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow } from "./ItemRow";
-
-const BACK = { href: "/", label: "Back to My trips" };
 
 export function PackingList() {
   const { id } = useParams<{ id: string }>();
@@ -27,8 +26,10 @@ export function PackingList() {
     if (name) document.title = `${name} · Pack Again`;
   }, [name]);
 
-  if (storage.status === "loading" || !storage.data || !trip) {
-    return <Page title="Packing list" back={BACK}>{null}</Page>;
+  if (storage.status === "loading") return <ListLoading />;
+
+  if (!storage.data || !trip) {
+    return <Page title="Packing list" back={BACK_TO_MY_TRIPS}>{null}</Page>;
   }
 
   const { data } = storage;
@@ -53,7 +54,7 @@ export function PackingList() {
   const packed = trip.items.filter((item) => item.packed).length;
 
   return (
-    <Page title={trip.name} back={BACK}>
+    <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
       <RunwayProgress packed={packed} total={trip.items.length} />
       <StorageNotice problem={storage.problem} />
       <p aria-live="polite" className="sr-only">
