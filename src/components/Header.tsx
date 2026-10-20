@@ -9,17 +9,13 @@ export function Header({ title }: HeaderProps) {
   return (
     <header data-surface="board" className="bg-board text-amber">
       <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-5 sm:px-6">
-        <div className="flex items-center justify-between gap-4 font-mono text-xs uppercase tracking-widest">
+        <div className="flex items-center font-mono text-xs uppercase tracking-widest">
           <Link
             href="/"
             className="-mx-1 inline-flex min-h-11 shrink-0 items-center rounded px-1 underline-offset-4 hover:underline active:bg-amber active:text-board"
           >
             Pack Again
           </Link>
-          {/* Repeats the h1 in board style; hidden so screen readers hear the name once. */}
-          <span aria-hidden="true" className="min-w-0 truncate">
-            {title}
-          </span>
         </div>
         <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide sm:text-5xl">
           {title}
