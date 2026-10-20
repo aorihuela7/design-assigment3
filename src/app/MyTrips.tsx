@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { Button, ButtonLink } from "@/components/Button";
 import { Card } from "@/components/Card";
-import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
+import { StorageNotice } from "@/components/StorageNotice";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
 import { createIfMissing, saveData, useStorage, type StoredData, type Trip } from "@/lib/storage";
@@ -53,7 +53,7 @@ export function MyTrips() {
   if (storage.status === "ready" && storage.problem === "newer") {
     return (
       <Page title="My trips">
-        <Notice>Your lists were saved by a newer version of Pack Again. Reload the page to open them.</Notice>
+        <StorageNotice problem="newer" />
       </Page>
     );
   }
@@ -74,15 +74,7 @@ export function MyTrips() {
 
   return (
     <Page title="My trips">
-      {storage.problem === "blocked" && (
-        <Notice>This browser isn’t saving. Your lists will disappear when you close it.</Notice>
-      )}
-      {storage.problem === "recovered" && (
-        <Notice>We couldn’t read your saved lists. We kept a copy and started fresh.</Notice>
-      )}
-      {storage.problem === "full" && (
-        <Notice>Your last change wasn’t saved because this browser’s storage is full.</Notice>
-      )}
+      <StorageNotice problem={storage.problem} />
 
       {trips.length === 0 ? (
         // Only after the person deleted every list; starters never come back on their own.
