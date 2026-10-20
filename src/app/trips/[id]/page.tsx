@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Card } from "@/components/Card";
+import { Suspense } from "react";
 import { Page } from "@/components/Page";
+import { PackingList } from "./PackingList";
 
 export const metadata: Metadata = { title: "Packing list" };
 
+// useParams needs a Suspense boundary here: the id is only known at request time.
 export default function PackingListPage() {
   return (
-    <Page title="Packing list" back={{ href: "/", label: "Back to My trips" }}>
-      <Card>
-        <p>Placeholder. The packing list will go here.</p>
-      </Card>
-    </Page>
+    <Suspense fallback={<Page title="Packing list" back={{ href: "/", label: "Back to My trips" }}>{null}</Page>}>
+      <PackingList />
+    </Suspense>
   );
 }

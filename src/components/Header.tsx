@@ -17,7 +17,7 @@ export function Header({ title }: HeaderProps) {
             Pack Again
           </Link>
         </div>
-        <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide sm:text-5xl">
+        <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide wrap-anywhere sm:text-5xl">
           {title}
         </h1>
       </div>
