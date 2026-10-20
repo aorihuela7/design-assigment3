@@ -14,11 +14,29 @@ import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } f
 import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
-import { ItemRow, RemovedRow, UNDO_ROW_ID } from "./ItemRow";
+import { ItemRow, RemovedRow, UNDO_ROW_ID, undoHoldProps, type UndoHold } from "./ItemRow";
 import { ProgressBar } from "./ProgressBar";
 import { TripActions } from "./TripActions";
 
 const COUNT_ID = "packed-count";
+const UNDO_BAR_ID = "undo-bar";
+// How long Undo stays after you move away from it.
+const UNDO_MS = 3000;
+
+// When Undo times out while focused, focus moves to the next item on screen
+// (or the previous one, or the Add item field), so it's never lost.
+function moveFocusOffUndo() {
+  const row = document.getElementById(UNDO_ROW_ID)?.closest("li");
+  const active = document.activeElement;
+  if (!row || !(row.contains(active) || active?.id === UNDO_BAR_ID)) return null;
+  const boxes = [...document.querySelectorAll<HTMLElement>("main input[type=checkbox]")];
+  return (
+    boxes.find((box) => row.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING) ??
+    boxes.at(-1) ??
+    document.querySelector<HTMLElement>("main form input")
+  );
+}
+
 export function PackingList() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -33,6 +51,27 @@ export function PackingList() {
     null,
   );
   const setAnnouncement = (text: string) => setFeedback({ text });
+
+  // Undo disappears UNDO_MS after a removal, counting again from when the pointer
+  // or keyboard focus leaves it.
+  const pendingId = feedback?.undo?.item.id ?? null;
+  const [hold, setHold] = useState({ id: null as string | null, pointer: false, focus: false });
+  const holdUndo: UndoHold = (reason, held) =>
+    setHold((current) => ({
+      ...(current.id === pendingId ? current : { pointer: false, focus: false }),
+      id: pendingId,
+      [reason]: held,
+    }));
+  const undoHeld = pendingId !== null && hold.id === pendingId && (hold.pointer || hold.focus);
+  useEffect(() => {
+    if (pendingId === null || undoHeld) return;
+    const timer = setTimeout(() => {
+      const next = moveFocusOffUndo();
+      setFeedback((current) => (current?.undo?.item.id === pendingId ? null : current));
+      if (next) requestAnimationFrame(() => next.focus());
+    }, UNDO_MS);
+    return () => clearTimeout(timer);
+  }, [pendingId, undoHeld]);
   // The row just added or restored, so it can be highlighted where it lands.
   const [arrivedId, setArrivedId] = useState<string | null>(null);
 
@@ -114,7 +153,7 @@ export function PackingList() {
     // Visible too: the new row may be far down the page.
     setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
-  // A placeholder row with Undo takes the item's place (and focus) until the next change.
+  // A placeholder row with Undo takes the item's place (and focus) for a few seconds.
   const remove = (removed: Item) => {
     let index = trip.items.indexOf(removed);
     change((items) => {
@@ -189,6 +228,8 @@ export function PackingList() {
               <p>{feedback.text}</p>
               {feedback.undo && (
                 <Button
+                  id={UNDO_BAR_ID}
+                  {...undoHoldProps(holdUndo)}
                   aria-label={`Undo removing ${feedback.undo.item.name}`}
                   onClick={() => feedback.undo && undoRemove(feedback.undo)}
                 >
@@ -240,7 +281,12 @@ export function PackingList() {
             <ul className="divide-y divide-line">
               {group.items.map((item) =>
                 item.id === pending?.item.id ? (
-                  <RemovedRow key={`removed-${item.id}`} name={item.name} onUndo={() => undoRemove(pending)} />
+                  <RemovedRow
+                    key={`removed-${item.id}`}
+                    name={item.name}
+                    onUndo={() => undoRemove(pending)}
+                    onHold={holdUndo}
+                  />
                 ) : (
                   <ItemRow
                     key={item.id}
