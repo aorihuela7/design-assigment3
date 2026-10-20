@@ -12,11 +12,14 @@ export function Header({ title }: HeaderProps) {
         <div className="flex items-center justify-between gap-4 font-mono text-xs uppercase tracking-widest">
           <Link
             href="/"
-            className="-mx-1 inline-flex min-h-11 items-center rounded px-1 underline-offset-4 hover:underline active:bg-amber active:text-board"
+            className="-mx-1 inline-flex min-h-11 shrink-0 items-center rounded px-1 underline-offset-4 hover:underline active:bg-amber active:text-board"
           >
             Pack Again
           </Link>
-          <span aria-hidden="true">Departures</span>
+          {/* Repeats the h1 in board style; hidden so screen readers hear the name once. */}
+          <span aria-hidden="true" className="min-w-0 truncate">
+            {title}
+          </span>
         </div>
         <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide sm:text-5xl">
           {title}
