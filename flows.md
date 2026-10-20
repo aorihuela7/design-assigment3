@@ -1,6 +1,6 @@
 # Flows
 
-First visit → main task → coming back. Routes: `/` My trips, `/trips/new` New trip type, `/trips/[id]` Packing list.
+First visit → main task → coming back. Routes: `/` My trips, `/trips/new` New trip, `/trips/[id]` Packing list.
 
 ```mermaid
 flowchart TD
@@ -18,11 +18,11 @@ flowchart TD
   subgraph main["Main task"]
     direction TB
     B1["My trips"] -- "Open a card" --> B3["Packing list<br/>sticky bar: count and plane"]
-    B1 -- "New trip type" --> B2["Trip name<br/>empty · duplicate · too long"]
-    B2 -- "Create list" --> B3
+    B1 -- "New trip" --> B2["Trip name<br/>empty · duplicate · too long"]
+    B2 -- "Create trip" --> B3
     B3 -- "Add item" --> B4["Added X to Section<br/>or an error under the field"]
     B4 --> B3
-    B3 -- "Remove" --> B5["Removed X · Undo"]
+    B3 -- "Remove" --> B5["Removed X · Undo<br/>in the item's place"]
     B5 --> B3
     B3 -- "Tick every item" --> B6["All packed. Have a good trip."]
     B6 -- "Forgot something?" --> B7["Saved as packed and New,<br/>for next time"]
@@ -31,13 +31,13 @@ flowchart TD
 
   subgraph back["Coming back"]
     direction TB
-    C1(["Come back before the next trip"]) --> C2["My trips<br/>Last packed · N new since last trip"]
+    C1(["Come back before the next trip"]) --> C2["My trips<br/>Last packed · N added for next trip"]
     C2 -- "After 2+ days away" --> C3["Welcome back.<br/>N lists ready to pack again."]
     C2 -- "Forgot something? Add it" --> C7["List opens with<br/>Add item focused"]
     C2 -- "Open the list" --> C4{"Packed over 2 days ago<br/>and still ticked?"}
-    C4 -- "Yes" --> C5["Packing for a new trip?<br/>Clear ticks · Keep them"]
+    C4 -- "Yes" --> C5["Packing for a new trip?<br/>Clear all ticks · Keep them"]
     C4 -- "No" --> C8["The list as you left it"]
-    C5 -- "Clear ticks" --> C6["Ready to pack again<br/>New items listed first"]
+    C5 -- "Clear all ticks" --> C6["Ready to pack again<br/>New items listed first"]
     C5 -- "Keep them" --> C8
   end
 
