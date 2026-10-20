@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PlaneIcon } from "@/components/PlaneIcon";
 import { RunwayProgress } from "@/components/RunwayProgress";
 
 type ProgressBarProps = {
@@ -21,10 +22,8 @@ export function ProgressBar({ packed, total, countId, allPacked, message }: Prog
       <div role="status">
         {allPacked && (
           <p className="mt-2 flex items-center gap-2 font-semibold text-ink">
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-5 shrink-0">
-              <rect x="1" y="1" width="14" height="14" rx="2" fill="currentColor" />
-              <path d="M4 8.5l2.5 2.5L12 5.5" fill="none" stroke="var(--color-surface)" strokeWidth="2" />
-            </svg>
+            {/* The plane, not a tick: a filled tick box read like a checkbox. */}
+            <PlaneIcon className="size-5 shrink-0" />
             All packed. Have a good trip.
           </p>
         )}
