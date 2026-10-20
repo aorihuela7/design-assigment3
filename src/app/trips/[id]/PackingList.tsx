@@ -6,7 +6,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
-import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
+import { createId, saveData, SECTIONS, useStorage, type Item, type Section } from "@/lib/storage";
 import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
 import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
@@ -21,7 +21,7 @@ export function PackingList() {
   const storage = useStorage();
   const now = useNow();
   const inputRef = useRef<HTMLInputElement>(null);
-  // Read out by screen readers after adding or removing.
+  // The latest change, shown in the progress bar and read out politely.
   const [announcement, setAnnouncement] = useState("");
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
@@ -76,7 +76,8 @@ export function PackingList() {
     // list stays All packed and the item stands out next trip.
     const item = { id: createId(), name: itemName, section, packed: allPacked, isNew: allPacked };
     saveItems([...trip.items, item]);
-    setAnnouncement(`Added ${itemName}`);
+    // Visible too: the new row may be far down the page.
+    setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
   const remove = (removed: Item) => {
     // Focus goes to the next item on screen, else the previous one, else the Add item field.
@@ -105,11 +106,14 @@ export function PackingList() {
 
   return (
     <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
-      <ProgressBar packed={packed} total={trip.items.length} countId={COUNT_ID} allPacked={allPacked} />
+      <ProgressBar
+        packed={packed}
+        total={trip.items.length}
+        countId={COUNT_ID}
+        allPacked={allPacked}
+        message={announcement && <p>{announcement}</p>}
+      />
       <StorageNotice problem={storage.problem} />
-      <p aria-live="polite" className="sr-only">
-        {announcement}
-      </p>
 
       {/* In the page, not a modal, and it never takes focus on load. */}
       {now !== null && shouldAskNewTrip(trip, now) && (
