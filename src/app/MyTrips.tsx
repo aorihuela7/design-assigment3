@@ -61,6 +61,9 @@ export function MyTrips() {
       {storage.problem === "blocked" && (
         <Notice>This browser isn’t saving. Your lists will disappear when you close it.</Notice>
       )}
+      {storage.problem === "recovered" && (
+        <Notice>We couldn’t read your saved lists. We kept a copy and started fresh.</Notice>
+      )}
       {storage.problem === "full" && (
         <Notice>Your last change wasn’t saved because this browser’s storage is full.</Notice>
       )}
