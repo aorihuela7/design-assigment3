@@ -1,13 +1,15 @@
+import { Button } from "@/components/Button";
 import { NewBadge } from "@/components/NewBadge";
 import type { Item } from "@/lib/storage";
 
 type ItemRowProps = {
   item: Item;
   onToggle: () => void;
+  onRemove: () => void;
 };
 
 // The whole row is the checkbox's label, so the hit area is at least 44px high.
-export function ItemRow({ item, onToggle }: ItemRowProps) {
+export function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
   return (
     <li className="flex items-center gap-2 px-2">
       <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded px-2 py-2 hover:bg-canvas">
@@ -34,6 +36,10 @@ export function ItemRow({ item, onToggle }: ItemRowProps) {
         </span>
         {item.isNew && <NewBadge />}
       </label>
+      {/* Always visible, never only on hover. Removing is immediate. */}
+      <Button variant="quiet" aria-label={`Remove ${item.name}`} onClick={onRemove} className="shrink-0">
+        Remove
+      </Button>
     </li>
   );
 }

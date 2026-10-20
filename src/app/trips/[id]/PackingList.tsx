@@ -41,6 +41,15 @@ export function PackingList() {
     saveItems([...trip.items, { id: createId(), name: itemName, section, packed: false, isNew: false }]);
     setAnnouncement(`Added ${itemName}`);
   };
+  const remove = (removed: Item) => {
+    // Focus goes to the next item on screen, else the previous one, else the Add item field.
+    const order = groupBySection(trip.items).flatMap((group) => group.items);
+    const index = order.findIndex((item) => item.id === removed.id);
+    const next = order[index + 1] ?? order[index - 1];
+    saveItems(trip.items.filter((item) => item.id !== removed.id));
+    setAnnouncement(`Removed ${removed.name}`);
+    requestAnimationFrame(() => (next ? document.getElementById(`item-${next.id}`) : inputRef.current)?.focus());
+  };
   const packed = trip.items.filter((item) => item.packed).length;
 
   return (
@@ -61,7 +70,7 @@ export function PackingList() {
           <Card padded={false}>
             <ul className="divide-y divide-line">
               {group.items.map((item) => (
-                <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} />
+                <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} onRemove={() => remove(item)} />
               ))}
             </ul>
           </Card>
