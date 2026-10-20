@@ -9,10 +9,19 @@ type ItemRowProps = {
   onRemove: () => void;
   // Just added or restored: plays the arrive highlight once.
   arrived?: boolean;
+  // Just ticked by the person: the check and the strike-through draw in once.
+  justPacked?: boolean;
 };
 
+// The strike-through is a 1.5px line drawn as a background on the name's text, so
+// it can grow from left to right; each wrapped line gets its own. In forced-colors
+// mode backgrounds are dropped, so it falls back to a real line-through.
+const strike =
+  "bg-[linear-gradient(currentColor,currentColor)] bg-no-repeat bg-[length:100%_1.5px] bg-[position:0_58%] [box-decoration-break:clone] forced-colors:bg-none forced-colors:line-through";
+
 // The whole row is the checkbox's label, so the hit area is at least 44px high.
-export function ItemRow({ item, onToggle, onRemove, arrived = false }: ItemRowProps) {
+export function ItemRow({ item, onToggle, onRemove, arrived = false, justPacked = false }: ItemRowProps) {
+  const draw = justPacked ? "motion-safe:animate-draw" : "";
   return (
     <li className={`flex items-center gap-2 px-2 ${arrived ? "motion-safe:animate-arrive" : ""}`}>
       <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded px-2 py-2 hover:bg-canvas">
@@ -29,12 +38,22 @@ export function ItemRow({ item, onToggle, onRemove, arrived = false }: ItemRowPr
             viewBox="0 0 16 16"
             className="pointer-events-none absolute inset-0 m-auto hidden size-4 text-surface peer-checked:block"
           >
-            <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2.5" />
+            <path
+              d="M3 8.5l3 3 7-7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              pathLength={1}
+              strokeDasharray={1}
+              className={draw}
+            />
           </svg>
         </span>
         {/* Packed: checkmark, strike-through and hidden text, never color alone. */}
-        <span className={`min-w-0 flex-1 wrap-anywhere ${item.packed ? "text-muted line-through" : "text-ink"}`}>
-          {item.name}
+        <span className={`min-w-0 flex-1 wrap-anywhere ${item.packed ? "text-muted" : "text-ink"}`}>
+          <span className={item.packed ? `${strike} ${justPacked ? "motion-safe:animate-strike" : ""}` : ""}>
+            {item.name}
+          </span>
           {item.packed && <span className="sr-only"> Packed</span>}
         </span>
         {item.isNew && <NewBadge />}

@@ -74,6 +74,8 @@ export function PackingList() {
   }, [pendingId, undoHeld]);
   // The row just added or restored, so it can be highlighted where it lands.
   const [arrivedId, setArrivedId] = useState<string | null>(null);
+  // The item the person just ticked, so only it plays the tick animation.
+  const [justPackedId, setJustPackedId] = useState<string | null>(null);
 
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
@@ -136,7 +138,9 @@ export function PackingList() {
       return latest ? withItems(data, tripId, update(latest.items), changes) : data;
     });
   const toggle = (id: string) => {
+    const wasPacked = trip.items.find((item) => item.id === id)?.packed;
     change((items) => items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
+    setJustPackedId(wasPacked ? null : id);
     setFeedback(null);
     setArrivedId(null);
   };
@@ -150,6 +154,7 @@ export function PackingList() {
       return [...items, { id, name: itemName, section, packed: forgot, isNew: forgot }];
     });
     setArrivedId(id);
+    setJustPackedId(null);
     // Visible too: the new row may be far down the page.
     setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
@@ -162,6 +167,7 @@ export function PackingList() {
     });
     setFeedback({ text: `Removed ${removed.name}`, undo: { item: removed, index } });
     setArrivedId(null);
+    setJustPackedId(null);
     requestAnimationFrame(() => document.getElementById(UNDO_ROW_ID)?.focus());
   };
   // Puts the item back where it was and moves focus to it.
@@ -292,6 +298,7 @@ export function PackingList() {
                     key={item.id}
                     item={item}
                     arrived={item.id === arrivedId}
+                    justPacked={item.id === justPackedId}
                     onToggle={() => toggle(item.id)}
                     onRemove={() => remove(item)}
                   />

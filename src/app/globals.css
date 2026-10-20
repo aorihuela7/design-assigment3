@@ -22,6 +22,29 @@
      Used with motion-safe: only, so reduced motion means no animation. */
   --animate-arrive: arrive 1.8s ease-out;
 
+  /* Ticking an item: the check mark draws itself, and the strike-through runs
+     across the name. Also motion-safe: only. */
+  --animate-draw: draw 0.25s ease-out;
+  --animate-strike: strike 0.3s ease-out;
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes strike {
+    from {
+      background-size: 0% 1.5px;
+    }
+    to {
+      background-size: 100% 1.5px;
+    }
+  }
+
   @keyframes arrive {
     from {
       background-color: var(--color-canvas);
