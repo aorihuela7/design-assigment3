@@ -27,7 +27,7 @@ function Loading() {
       <p role="status" className="-mt-2 text-muted">
         Loading your lists…
       </p>
-      <ul aria-hidden="true" className="flex flex-col gap-4">
+      <ul aria-hidden="true" className="flex flex-col gap-8">
         {[0, 1, 2].map((i) => (
           <li key={i}>
             <Card className="flex flex-col gap-3">
@@ -105,7 +105,8 @@ export function MyTrips() {
             </ButtonLink>
           </div>
 
-          <ul className="flex flex-col gap-4">
+          {/* 32px: notches stick out 10px on each side, so they never meet. */}
+          <ul className="flex flex-col gap-8">
             {[...trips].sort(newestFirst).map((trip) => (
               <li key={trip.id}>
                 <BoardingPassCard
