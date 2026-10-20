@@ -93,7 +93,7 @@ export function MyTrips() {
           <h2 className="font-display text-2xl font-semibold uppercase tracking-wide">No lists yet</h2>
           <div className="flex flex-col gap-3 sm:flex-row">
             <ButtonLink variant="primary" href="/trips/new">
-              New trip type
+              New trip
             </ButtonLink>
             <Button onClick={() => addStartersBack(data)}>Add the starter lists back</Button>
           </div>
@@ -104,7 +104,7 @@ export function MyTrips() {
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             {intro && <p className="text-muted">{intro}</p>}
             <ButtonLink variant="primary" href="/trips/new" className="sm:ml-auto">
-              New trip type
+              New trip
             </ButtonLink>
           </div>
 

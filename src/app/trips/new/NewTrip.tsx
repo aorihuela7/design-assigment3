@@ -17,7 +17,7 @@ function message(problem: TripNameProblem): ReactNode {
   if (problem.kind === "long") return `Keep it under ${MAX_TRIP_NAME} characters`;
   return (
     <span>
-      You already have a list called ‘{problem.trip.name}’.{" "}
+      You already have a trip called ‘{problem.trip.name}’.{" "}
       {/* An invisible ::after makes the tap target 44px tall; the focus ring stays on the text. */}
       <Link
         href={`/trips/${problem.trip.id}`}
@@ -64,7 +64,7 @@ export function NewTrip() {
   }
 
   return (
-    <Page title="New trip type" back={{ href: "/", label: "Back to My trips" }}>
+    <Page title="New trip" back={{ href: "/", label: "Back to My trips" }}>
       <StorageNotice problem={problem} />
       {/* Data from a newer version must not be written over. */}
       {problem !== "newer" && (
@@ -81,7 +81,7 @@ export function NewTrip() {
             />
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button type="submit" variant="primary">
-                Create list
+                Create trip
               </Button>
               <ButtonLink href="/">Cancel</ButtonLink>
             </div>
