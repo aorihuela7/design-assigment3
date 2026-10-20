@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { ButtonLink } from "@/components/Button";
+import { Card } from "@/components/Card";
 import { Page } from "@/components/Page";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
@@ -10,6 +11,27 @@ import { createIfMissing, useStorage, type Trip } from "@/lib/storage";
 
 function newestFirst(a: Trip, b: Trip) {
   return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+}
+
+// Same on the server and the first client render, so hydration matches.
+function Loading() {
+  return (
+    <>
+      <p role="status" className="-mt-2 text-muted">
+        Loading your lists…
+      </p>
+      <ul aria-hidden="true" className="flex flex-col gap-4">
+        {[0, 1, 2].map((i) => (
+          <li key={i}>
+            <Card className="flex flex-col gap-3">
+              <span className="h-7 w-16 rounded bg-canvas" />
+              <span className="h-6 w-48 max-w-full rounded bg-canvas" />
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
 }
 
 export function MyTrips() {
@@ -20,8 +42,13 @@ export function MyTrips() {
     createIfMissing(createStarterTrips);
   }, []);
 
+  // Also covers the moment before the starter lists are created.
   if (storage.status === "loading" || storage.data === null) {
-    return <Page title="My trips">{null}</Page>;
+    return (
+      <Page title="My trips">
+        <Loading />
+      </Page>
+    );
   }
 
   const { trips } = storage.data;
