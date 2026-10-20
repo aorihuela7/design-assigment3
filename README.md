@@ -89,7 +89,7 @@ An AI agent used the live app twice as a first-time user, judging only from the 
 
 | Problem | Decision | What changed |
 |---|---|---|
-| Permanent removal | Fixed | "Removed Socks." with Undo in the bar, and a "Removed Socks · Undo" row in the item's place, with Undo focused, until your next change. Undo puts the item back and focuses it. |
+| Permanent removal | Fixed | "Removed Socks." with Undo in the bar, and a "Removed Socks · Undo" row in the item's place, with Undo focused. Both disappear 5 seconds after you move away from them (hovering or keyboard focus keeps them), or at your next change. Undo puts the item back and focuses it. |
 | New marks erased | Fixed | New marks clear only when the next trip is packed (after Clear all ticks), not when you re-tick within the same trip. |
 | Success off screen | Fixed | The count, plane and "All packed" sit in a bar that sticks to the top as you scroll. |
 | No add confirmation | Fixed | The bar shows "Added Sunglasses to Other" on screen, not only to screen readers. |

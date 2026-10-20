@@ -52,4 +52,4 @@ flowchart TD
 - An item added from "Forgot something?" is saved as already packed, so the list stays "All packed" for the trip you just took. It stays New until the next trip is packed: after the ticks are cleared, not when items are re-ticked within the same trip.
 - The "new trip?" prompt depends on today's date, so it is decided only after the page mounts.
 - The Add item section starts on the last section picked on that page (not stored).
-- Removing an item is immediate, with Undo in the progress bar until the next change.
+- Removing an item is immediate. Undo appears in the item's place and in the progress bar, and goes 5 seconds after you move away from it (hovering or keyboard focus keeps it), or at the next change.
