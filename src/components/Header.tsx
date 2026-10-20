@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const PAGE_TITLE_ID = "page-title";
+
 type HeaderProps = {
   // Current page name, shown large on the board and used as the page's h1.
   title: string;
@@ -17,7 +19,12 @@ export function Header({ title }: HeaderProps) {
             Pack Again
           </Link>
         </div>
-        <h1 className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide wrap-anywhere sm:text-5xl">
+        {/* tabIndex -1: pages can move focus here on arrival; no ring, since it isn't a control. */}
+        <h1
+          id={PAGE_TITLE_ID}
+          tabIndex={-1}
+          className="mt-1 font-display text-4xl font-semibold uppercase tracking-wide wrap-anywhere outline-none sm:text-5xl"
+        >
           {title}
         </h1>
       </div>

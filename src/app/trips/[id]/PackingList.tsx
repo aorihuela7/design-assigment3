@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { PAGE_TITLE_ID } from "@/components/Header";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, SECTIONS, useStorage, type Item, type Section } from "@/lib/storage";
@@ -39,8 +40,11 @@ export function PackingList() {
   const wantsAdd = useSearchParams().get("add") === "1";
   const isEmpty = trip?.items.length === 0;
   const hasTrip = Boolean(trip);
+  // Otherwise focus starts on the list name, so the next Tab reaches "Back to My trips".
   useEffect(() => {
-    if (hasTrip && (isEmpty || wantsAdd)) inputRef.current?.focus();
+    if (!hasTrip) return;
+    if (isEmpty || wantsAdd) inputRef.current?.focus();
+    else document.getElementById(PAGE_TITLE_ID)?.focus({ preventScroll: true });
   }, [hasTrip, isEmpty, wantsAdd]);
 
   if (storage.status === "loading") return <ListLoading />;
