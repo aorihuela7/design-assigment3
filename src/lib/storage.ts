@@ -263,6 +263,33 @@ export function saveData(data: StoredData): SaveResult {
   return result;
 }
 
+// The latest data: what's saved right now (another tab may have written since this
+// one last read), else what this tab holds in memory (for example when storage is
+// blocked). Data that can't be read is backed up before anything replaces it.
+function latest(): StoredData | null {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw !== null) {
+      const parsed = parseData(raw);
+      if (parsed.kind === "ok") return parsed.data;
+      if (parsed.kind === "unreadable") window.localStorage.setItem(BACKUP_KEY, raw);
+    }
+  } catch {
+    // Blocked or full: fall back to memory.
+  }
+  const current = getSnapshot();
+  return current.status === "ready" ? current.data : null;
+}
+
+// Applies a change to the latest data and saves it, so quick successive changes, or
+// changes made in two tabs, never undo each other.
+export function updateData(change: (data: StoredData) => StoredData): SaveResult {
+  const current = getSnapshot();
+  if (current.status === "ready" && current.problem === "newer") return "newer";
+  const base = latest();
+  return base ? saveData(change(base)) : "blocked";
+}
+
 // First visit: saves the given trips only if nothing was ever saved. Never runs over
 // recovered, empty or newer data, and is safe to call twice (Strict Mode effects).
 export function createIfMissing(createTrips: () => Trip[]) {

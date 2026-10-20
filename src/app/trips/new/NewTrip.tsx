@@ -9,7 +9,7 @@ import { TextField } from "@/components/Field";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createStarterTrips } from "@/lib/starters";
-import { createId, createIfMissing, saveData, useStorage } from "@/lib/storage";
+import { createId, createIfMissing, updateData, useStorage } from "@/lib/storage";
 import { cleanName, MAX_TRIP_NAME, tripNameProblem, type TripNameProblem } from "@/lib/trips";
 
 function message(problem: TripNameProblem): ReactNode {
@@ -58,7 +58,7 @@ export function NewTrip() {
     const clean = cleanName(name);
     const id = createId();
     const trip = { id, name: clean, items: [], lastPackedAt: null, promptDismissedAt: null, ticksClearedAt: null, updatedAt: new Date().toISOString() };
-    saveData({ ...storage.data, trips: [...storage.data.trips, trip] });
+    updateData((data) => ({ ...data, trips: [...data.trips, trip] }));
     // The empty list focuses its Add item field.
     router.push(`/trips/${id}`);
   }

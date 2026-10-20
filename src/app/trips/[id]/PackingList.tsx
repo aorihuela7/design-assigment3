@@ -7,7 +7,7 @@ import { Card } from "@/components/Card";
 import { PAGE_TITLE_ID } from "@/components/Header";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
-import { createId, saveData, SECTIONS, useStorage, type Item, type Section } from "@/lib/storage";
+import { createId, SECTIONS, updateData, useStorage, type Item, type Section, type Trip } from "@/lib/storage";
 import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
 import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
@@ -75,40 +75,51 @@ export function PackingList() {
     );
   }
 
-  const { data } = storage;
   const tripId = trip.id;
-  // Every change is saved straight away.
-  const saveItems = (items: Item[]) => saveData(withItems(data, tripId, items));
+  // Every change is saved straight away, applied to the latest saved items, so
+  // quick successive changes or another open tab never get overwritten.
+  type TripChanges = Partial<Pick<Trip, "promptDismissedAt" | "ticksClearedAt">>;
+  const change = (update: (items: Item[]) => Item[], changes: TripChanges = {}) =>
+    updateData((data) => {
+      const latest = data.trips.find((t) => t.id === tripId);
+      return latest ? withItems(data, tripId, update(latest.items), changes) : data;
+    });
   const toggle = (id: string) => {
-    saveItems(trip.items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
+    change((items) => items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
     setFeedback(null);
   };
   const allPacked = isAllPacked(trip.items);
   const add = (itemName: string, section: Section) => {
     // Added after a full pack ("Forgot something?"): saved as packed and New, so the
     // list stays All packed and the item stands out next trip.
-    const item = { id: createId(), name: itemName, section, packed: allPacked, isNew: allPacked };
-    saveItems([...trip.items, item]);
+    change((items) => {
+      const forgot = isAllPacked(items);
+      return [...items, { id: createId(), name: itemName, section, packed: forgot, isNew: forgot }];
+    });
     // Visible too: the new row may be far down the page.
     setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
   // A placeholder row with Undo takes the item's place (and focus) until the next change.
   const remove = (removed: Item) => {
-    saveItems(trip.items.filter((item) => item.id !== removed.id));
-    setFeedback({ text: `Removed ${removed.name}`, undo: { item: removed, index: trip.items.indexOf(removed) } });
+    let index = trip.items.indexOf(removed);
+    change((items) => {
+      index = items.findIndex((item) => item.id === removed.id);
+      return items.filter((item) => item.id !== removed.id);
+    });
+    setFeedback({ text: `Removed ${removed.name}`, undo: { item: removed, index } });
     requestAnimationFrame(() => document.getElementById(UNDO_ROW_ID)?.focus());
   };
   // Puts the item back where it was and moves focus to it.
   const undoRemove = ({ item, index }: { item: Item; index: number }) => {
-    const items = [...trip.items];
-    items.splice(index, 0, item);
-    saveItems(items);
+    change((items) =>
+      items.some((i) => i.id === item.id) ? items : [...items.slice(0, index), item, ...items.slice(index)],
+    );
     setAnnouncement(`Restored ${item.name}`);
     requestAnimationFrame(() => document.getElementById(`item-${item.id}`)?.focus());
   };
   const focusCount = () => requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
   const clearTicks = () => {
-    saveData(withItems(data, tripId, untickAll(trip.items), { ticksClearedAt: new Date().toISOString() }));
+    change(untickAll, { ticksClearedAt: new Date().toISOString() });
     setAnnouncement("Ticks cleared");
     focusCount();
   };
@@ -116,8 +127,8 @@ export function PackingList() {
   // until the next full pack.
   const answerNewTrip = (clear: boolean) => {
     const now = new Date().toISOString();
-    const changes = clear ? { promptDismissedAt: now, ticksClearedAt: now } : { promptDismissedAt: now };
-    saveData(withItems(data, tripId, clear ? untickAll(trip.items) : trip.items, changes));
+    if (clear) change(untickAll, { promptDismissedAt: now, ticksClearedAt: now });
+    else change((items) => items, { promptDismissedAt: now });
     if (clear) setAnnouncement("Ticks cleared");
     focusCount();
   };

@@ -8,7 +8,7 @@ import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
-import { createIfMissing, saveData, useStorage, type StoredData, type Trip } from "@/lib/storage";
+import { createIfMissing, updateData, useStorage, type Trip } from "@/lib/storage";
 import { welcomeBackCount } from "@/lib/trips";
 import { useNow } from "@/lib/useNow";
 
@@ -16,8 +16,8 @@ function newestFirst(a: Trip, b: Trip) {
   return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
 }
 
-function addStartersBack(data: StoredData) {
-  saveData({ ...data, trips: createStarterTrips() });
+function addStartersBack() {
+  updateData((data) => ({ ...data, trips: [...data.trips, ...createStarterTrips()] }));
   // The button is gone now; move focus to the first list instead of losing it.
   requestAnimationFrame(() => document.querySelector<HTMLElement>("[data-card-link]")?.focus());
 }
@@ -95,7 +95,7 @@ export function MyTrips() {
             <ButtonLink variant="primary" href="/trips/new">
               New trip
             </ButtonLink>
-            <Button onClick={() => addStartersBack(data)}>Add the starter lists back</Button>
+            <Button onClick={addStartersBack}>Add the starter lists back</Button>
           </div>
         </Card>
       ) : (
