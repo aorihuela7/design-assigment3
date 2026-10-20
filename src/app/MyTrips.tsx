@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect } from "react";
+import { BoardingPassCard } from "@/components/BoardingPassCard";
+import { ButtonLink } from "@/components/Button";
+import { Page } from "@/components/Page";
+import { uniqueCodes } from "@/lib/codes";
+import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
+import { createIfMissing, useStorage, type Trip } from "@/lib/storage";
+
+function newestFirst(a: Trip, b: Trip) {
+  return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+}
+
+export function MyTrips() {
+  const storage = useStorage();
+
+  // First visit: the lists are there right away, nothing asked first.
+  useEffect(() => {
+    createIfMissing(createStarterTrips);
+  }, []);
+
+  if (storage.status === "loading" || storage.data === null) {
+    return <Page title="My trips">{null}</Page>;
+  }
+
+  const { trips } = storage.data;
+  // Codes come from storage order, so they stay put when the sort changes.
+  const codes = uniqueCodes(trips);
+
+  return (
+    <Page title="My trips">
+      {isUntouchedStarters(trips) && <p className="-mt-2 text-muted">Starter lists. Open one, make it yours.</p>}
+
+      <ul className="flex flex-col gap-4">
+        {[...trips].sort(newestFirst).map((trip) => (
+          <li key={trip.id}>
+            <BoardingPassCard
+              name={trip.name}
+              code={codes.get(trip.id) ?? ""}
+              packed={trip.items.filter((item) => item.packed).length}
+              total={trip.items.length}
+              lastPackedAt={trip.lastPackedAt}
+              newCount={trip.items.filter((item) => item.isNew).length}
+              href={`/trips/${trip.id}`}
+            />
+          </li>
+        ))}
+      </ul>
+
+      <div>
+        <ButtonLink variant="primary" href="/trips/new">
+          New trip type
+        </ButtonLink>
+      </div>
+
+      <p className="mt-auto text-sm text-muted">Saved on this device.</p>
+    </Page>
+  );
+}

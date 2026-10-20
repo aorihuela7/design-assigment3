@@ -261,6 +261,15 @@ export function saveData(data: StoredData): SaveResult {
   return result;
 }
 
+// First visit: saves the given trips only if nothing was ever saved. Never runs over
+// recovered, empty or newer data, and is safe to call twice (Strict Mode effects).
+export function createIfMissing(createTrips: () => Trip[]) {
+  const current = getSnapshot();
+  if (current.status === "ready" && current.data === null && current.problem !== "newer") {
+    saveData({ version: VERSION, trips: createTrips() });
+  }
+}
+
 export function useStorage(): StorageState {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
