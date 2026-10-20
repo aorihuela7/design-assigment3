@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { Button, ButtonLink } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
 import { uniqueCodes } from "@/lib/codes";
+import { clearFlash, peekFlash } from "@/lib/flash";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
 import { createIfMissing, updateData, useStorage, type Trip } from "@/lib/storage";
 import { welcomeBackCount } from "@/lib/trips";
@@ -47,6 +49,18 @@ export function MyTrips() {
   const storage = useStorage();
   const now = useNow();
 
+  // A message from the page before, like "Deleted Beach weekend". It takes focus
+  // once, so it's read out and keyboard focus isn't lost.
+  const [flash] = useState(peekFlash);
+  const flashRef = useRef<HTMLDivElement>(null);
+  const ready = storage.status === "ready" && storage.data !== null;
+  useEffect(() => {
+    clearFlash();
+  }, []);
+  useEffect(() => {
+    if (ready) flashRef.current?.focus();
+  }, [ready]);
+
   // First visit: the lists are there right away, nothing asked first.
   useEffect(() => {
     createIfMissing(createStarterTrips);
@@ -85,6 +99,11 @@ export function MyTrips() {
 
   return (
     <Page title="My trips">
+      {flash && (
+        <div ref={flashRef} tabIndex={-1} className="outline-none">
+          <Notice>{flash}</Notice>
+        </div>
+      )}
       <StorageNotice problem={storage.problem} />
 
       {trips.length === 0 ? (

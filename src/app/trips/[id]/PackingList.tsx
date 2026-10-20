@@ -1,12 +1,13 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { PAGE_TITLE_ID } from "@/components/Header";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
+import { setFlash } from "@/lib/flash";
 import { createId, SECTIONS, updateData, useStorage, type Item, type Section, type Trip } from "@/lib/storage";
 import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
 import { useNow } from "@/lib/useNow";
@@ -19,8 +20,11 @@ import { TripActions } from "./TripActions";
 const COUNT_ID = "packed-count";
 export function PackingList() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const storage = useStorage();
   const now = useNow();
+  // Set while leaving a just-deleted trip, so the page doesn't flash "not found".
+  const [deletedName, setDeletedName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   // The latest change, shown in the progress bar and read out politely. After a
   // removal it carries what's needed to undo it, until the next change.
@@ -54,6 +58,10 @@ export function PackingList() {
   }, [hasTrip, isEmpty, wantsAdd]);
 
   if (storage.status === "loading") return <ListLoading />;
+
+  if (deletedName) {
+    return <Page title={deletedName} back={BACK_TO_MY_TRIPS}>{null}</Page>;
+  }
 
   // Saved by a newer version: nothing here can be shown or changed safely.
   if (storage.problem === "newer") {
@@ -140,6 +148,13 @@ export function PackingList() {
       trips: data.trips.map((t) => (t.id === tripId ? { ...t, name, updatedAt } : t)),
     }));
     setAnnouncement(`Renamed to ${name}`);
+  };
+  // Back to My trips, which says what was deleted and puts focus on that message.
+  const deleteTrip = () => {
+    setDeletedName(trip.name);
+    setFlash(`Deleted ${trip.name}`);
+    updateData((data) => ({ ...data, trips: data.trips.filter((t) => t.id !== tripId) }));
+    router.replace("/");
   };
   const packed = trip.items.filter((item) => item.packed).length;
   // The removed item stays on screen as a placeholder, in its old position.
@@ -233,6 +248,7 @@ export function PackingList() {
         packed={packed}
         onClearTicks={clearTicks}
         onRename={rename}
+        onDelete={deleteTrip}
       />
     </Page>
   );

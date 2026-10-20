@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { TextField } from "@/components/Field";
@@ -12,20 +12,28 @@ type TripActionsProps = {
   packed: number;
   onClearTicks: () => void;
   onRename: (name: string) => void;
+  onDelete: () => void;
 };
 
-// The bottom of the list: Clear all ticks and Rename trip. Renaming opens a form
-// in place (not a modal); Escape or Cancel closes it and focus goes back.
-export function TripActions({ trip, otherTrips, packed, onClearTicks, onRename }: TripActionsProps) {
-  const [renaming, setRenaming] = useState(false);
+// The bottom of the list: Clear all ticks, Rename trip and Delete trip. Rename and
+// Delete open in place (never a modal); Escape or Cancel closes them and focus
+// goes back to the button that opened them.
+export function TripActions({ trip, otherTrips, packed, onClearTicks, onRename, onDelete }: TripActionsProps) {
+  const [mode, setMode] = useState<"idle" | "rename" | "delete">("idle");
   const renameButton = useRef<HTMLButtonElement>(null);
+  const deleteButton = useRef<HTMLButtonElement>(null);
 
   const close = () => {
-    setRenaming(false);
-    requestAnimationFrame(() => renameButton.current?.focus());
+    const opener = mode === "rename" ? renameButton : deleteButton;
+    setMode("idle");
+    requestAnimationFrame(() => opener.current?.focus());
   };
 
-  if (renaming) {
+  if (mode === "delete") {
+    return <DeleteConfirm trip={trip} onDelete={onDelete} onCancel={close} />;
+  }
+
+  if (mode === "rename") {
     return (
       <RenameForm
         current={trip.name}
@@ -46,10 +54,47 @@ export function TripActions({ trip, otherTrips, packed, onClearTicks, onRename }
           Clear all ticks
         </Button>
       )}
-      <Button ref={renameButton} onClick={() => setRenaming(true)}>
+      <Button ref={renameButton} onClick={() => setMode("rename")}>
         Rename trip
       </Button>
+      <Button ref={deleteButton} onClick={() => setMode("delete")}>
+        Delete trip
+      </Button>
     </div>
+  );
+}
+
+// The question takes focus, so a second Enter can't delete by accident; Tab
+// reaches Delete trip, then Cancel.
+function DeleteConfirm({ trip, onDelete, onCancel }: { trip: Trip; onDelete: () => void; onCancel: () => void }) {
+  const items = trip.items.length;
+  const question = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    question.current?.focus();
+  }, []);
+  return (
+    <Card>
+      <div
+        role="group"
+        aria-labelledby="delete-question"
+        onKeyDown={(event) => event.key === "Escape" && onCancel()}
+        className="flex flex-col gap-4"
+      >
+        <p
+          id="delete-question"
+          tabIndex={-1}
+          ref={question}
+          className="font-semibold text-ink outline-none"
+        >
+          Delete {trip.name}
+          {items > 0 && ` and its ${items} ${items === 1 ? "item" : "items"}`}? This can’t be undone.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button onClick={onDelete}>Delete trip</Button>
+          <Button onClick={onCancel}>Cancel</Button>
+        </div>
+      </div>
+    </Card>
   );
 }
 
