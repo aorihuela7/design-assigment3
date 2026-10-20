@@ -30,7 +30,7 @@ function Loading() {
   return (
     <>
       <p role="status" className="-mt-2 text-muted">
-        Loading your lists…
+        Loading your trips…
       </p>
       <ul aria-hidden="true" className="flex flex-col gap-8">
         {[0, 1, 2].map((i) => (
@@ -93,9 +93,9 @@ export function MyTrips() {
   const readyAgain = now === null ? 0 : welcomeBackCount(trips, now);
   const intro =
     readyAgain > 0
-      ? `Welcome back. ${readyAgain} ${readyAgain === 1 ? "list" : "lists"} ready to pack again.`
+      ? `Welcome back. ${readyAgain} ${readyAgain === 1 ? "trip" : "trips"} ready to pack again.`
       : isUntouchedStarters(trips)
-        ? "Starter lists. Open one, make it yours."
+        ? "Starter trips. Open one, make it yours."
         : null;
 
   return (
@@ -110,12 +110,12 @@ export function MyTrips() {
       {trips.length === 0 ? (
         // Only after the person deleted every list; starters never come back on their own.
         <Card className="flex flex-col gap-4">
-          <SectionHeading>No lists yet</SectionHeading>
+          <SectionHeading>No trips yet</SectionHeading>
           <div className="flex flex-col gap-3 sm:flex-row">
             <ButtonLink variant="primary" href="/trips/new">
               New trip
             </ButtonLink>
-            <Button onClick={addStartersBack}>Add the starter lists back</Button>
+            <Button onClick={addStartersBack}>Add the starter trips back</Button>
           </div>
         </Card>
       ) : (

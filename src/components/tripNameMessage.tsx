@@ -12,7 +12,7 @@ export function tripNameMessage(problem: TripNameProblem): ReactNode {
       <TextLink href={`/trips/${problem.trip.id}`} inline>
         Open it
       </TextLink>{" "}
-      or choose another name
+      or use another name
     </span>
   );
 }

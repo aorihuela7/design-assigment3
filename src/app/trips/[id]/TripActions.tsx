@@ -140,7 +140,7 @@ function RenameForm({ current, otherTrips, onSave, onCancel }: RenameFormProps) 
           error={problem ? tripNameMessage(problem) : undefined}
         />
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button type="submit">Save name</Button>
+          <Button type="submit">Save</Button>
           <Button onClick={onCancel}>Cancel</Button>
         </div>
       </form>

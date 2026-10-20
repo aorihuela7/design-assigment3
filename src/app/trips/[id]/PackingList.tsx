@@ -38,7 +38,7 @@ export function PackingList() {
 
   // The tab title names the list too, so the person knows where they are.
   const tabTitle =
-    trip?.name ?? (storage.status === "ready" && storage.problem !== "newer" ? "List not found" : null);
+    trip?.name ?? (storage.status === "ready" && storage.problem !== "newer" ? "Trip not found" : null);
   useEffect(() => {
     if (tabTitle) document.title = `${tabTitle} · Pack Again`;
   }, [tabTitle]);
@@ -76,10 +76,10 @@ export function PackingList() {
   // Unknown id: an old bookmark, a deleted list, or nothing saved yet.
   if (!storage.data || !trip) {
     return (
-      <Page title="List not found" back={BACK_TO_MY_TRIPS}>
+      <Page title="Trip not found" back={BACK_TO_MY_TRIPS}>
         <StorageNotice problem={storage.problem} />
         <Card>
-          <p>This list doesn’t exist anymore.</p>
+          <p>This trip doesn’t exist anymore.</p>
         </Card>
       </Page>
     );

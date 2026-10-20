@@ -9,7 +9,7 @@ export function ListLoading() {
   return (
     <Page title="Packing list" back={BACK_TO_MY_TRIPS}>
       <p role="status" className="text-muted">
-        Loading your list…
+        Loading your trip…
       </p>
       <div aria-hidden="true">
         <Card padded={false}>
