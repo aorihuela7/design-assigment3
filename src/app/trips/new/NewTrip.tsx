@@ -18,7 +18,11 @@ function message(problem: TripNameProblem): ReactNode {
   return (
     <span>
       You already have a list called ‘{problem.trip.name}’.{" "}
-      <Link href={`/trips/${problem.trip.id}`} className="rounded underline underline-offset-4 hover:decoration-2">
+      {/* An invisible ::after makes the tap target 44px tall; the focus ring stays on the text. */}
+      <Link
+        href={`/trips/${problem.trip.id}`}
+        className="relative rounded underline underline-offset-4 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-[''] hover:decoration-2"
+      >
         Open it
       </Link>{" "}
       or choose another name
