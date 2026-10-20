@@ -18,7 +18,7 @@ type ProgressBarProps = {
 export function ProgressBar({ packed, total, countId, allPacked, onForgot, message }: ProgressBarProps) {
   return (
     // Live regions stay rendered even when empty; their content adds the spacing.
-    <div className="sticky top-0 z-30 -mx-4 border-b border-line bg-canvas px-4 py-3 sm:-mx-6 sm:px-6">
+    <div className="sticky top-0 z-30 border-b border-line bg-canvas py-3">
       <RunwayProgress packed={packed} total={total} countId={countId} />
       {/* Always rendered, so the message is announced when it appears. In the page, not a modal. */}
       <div role="status">
