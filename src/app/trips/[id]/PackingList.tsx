@@ -26,6 +26,12 @@ export function PackingList() {
     if (name) document.title = `${name} · Pack Again`;
   }, [name]);
 
+  // An empty list opens ready to type the first item.
+  const isEmpty = trip?.items.length === 0;
+  useEffect(() => {
+    if (isEmpty) inputRef.current?.focus();
+  }, [isEmpty]);
+
   if (storage.status === "loading") return <ListLoading />;
 
   if (!storage.data || !trip) {
@@ -62,6 +68,12 @@ export function PackingList() {
       </p>
 
       <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} />
+
+      {trip.items.length === 0 && (
+        <Card>
+          <p>Nothing here yet. Add your first item.</p>
+        </Card>
+      )}
 
       {groupBySection(trip.items).map((group) => (
         <section key={group.section} aria-labelledby={`section-${group.section}`} className="flex flex-col gap-2">
