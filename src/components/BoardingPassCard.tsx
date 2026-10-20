@@ -64,6 +64,12 @@ export function BoardingPassCard({ name, code, packed, total, lastPackedAt, newC
               Last packed {formatDay(lastPackedAt)}
             </p>
           )}
+          {href && (
+            // Visual cue only; the list name is the link's accessible name.
+            <span aria-hidden="true" className="self-end font-mono text-xs uppercase tracking-wider text-ink">
+              Open →
+            </span>
+          )}
         </div>
       </div>
     </Card>
