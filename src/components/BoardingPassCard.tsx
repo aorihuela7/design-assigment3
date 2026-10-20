@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { Card, CardLink } from "./Card";
 import { NewBadge } from "./NewBadge";
 import { RunwayProgress } from "./RunwayProgress";
+import { TextLink } from "./TextLink";
 
 type BoardingPassCardProps = {
   name: string;
@@ -61,12 +61,9 @@ export function BoardingPassCard({
           )}
           {newCount > 0 && forgotHref && (
             // A sibling of the main link, never inside it; z-20 lifts it above the card-wide hit area.
-            <Link
-              href={forgotHref}
-              className="relative z-20 inline-flex min-h-11 items-center self-start rounded font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 hover:decoration-2 active:text-muted"
-            >
+            <TextLink href={forgotHref} className="relative z-20 self-start font-mono text-xs uppercase tracking-wider">
               Forgot something? Add it<span className="sr-only"> to {name}</span>
-            </Link>
+            </TextLink>
           )}
         </div>
 

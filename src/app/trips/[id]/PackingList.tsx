@@ -7,6 +7,7 @@ import { Card } from "@/components/Card";
 import { PAGE_TITLE_ID } from "@/components/Header";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
+import { SectionHeading } from "@/components/SectionHeading";
 import { setFlash } from "@/lib/flash";
 import { createId, SECTIONS, updateData, useStorage, type Item, type Section, type Trip } from "@/lib/storage";
 import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
@@ -197,9 +198,9 @@ export function PackingList() {
       {now !== null && shouldAskNewTrip(trip, now) && (
         <section role="region" aria-labelledby="new-trip-heading">
           <Card className="flex flex-col gap-4">
-            <h2 id="new-trip-heading" className="font-display text-2xl font-semibold uppercase tracking-wide">
+            <SectionHeading id="new-trip-heading">
               Packing for a new trip?
-            </h2>
+            </SectionHeading>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button onClick={() => answerNewTrip(true)}>Clear all ticks</Button>
               <Button onClick={() => answerNewTrip(false)}>Keep them</Button>
@@ -225,9 +226,9 @@ export function PackingList() {
 
       {groupBySection(rows).map((group) => (
         <section key={group.section} aria-labelledby={`section-${group.section}`} className="flex flex-col gap-2">
-          <h2 id={`section-${group.section}`} className="font-display text-2xl font-semibold uppercase tracking-wide">
+          <SectionHeading id={`section-${group.section}`}>
             {group.label}
-          </h2>
+          </SectionHeading>
           <Card padded={false}>
             <ul className="divide-y divide-line">
               {group.items.map((item) =>

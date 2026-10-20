@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { MAX_TRIP_NAME, type TripNameProblem } from "@/lib/trips";
+import { TextLink } from "./TextLink";
 
 // What to do next when a trip name can't be used. Shared by New trip and Rename.
 export function tripNameMessage(problem: TripNameProblem): ReactNode {
@@ -9,13 +9,9 @@ export function tripNameMessage(problem: TripNameProblem): ReactNode {
   return (
     <span>
       You already have a trip called ‘{problem.trip.name}’.{" "}
-      {/* An invisible ::after makes the tap target 44px tall; the focus ring stays on the text. */}
-      <Link
-        href={`/trips/${problem.trip.id}`}
-        className="relative rounded underline underline-offset-4 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-[''] hover:decoration-2"
-      >
+      <TextLink href={`/trips/${problem.trip.id}`} inline>
         Open it
-      </Link>{" "}
+      </TextLink>{" "}
       or choose another name
     </span>
   );

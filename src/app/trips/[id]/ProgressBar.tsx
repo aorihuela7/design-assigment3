@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { PlaneIcon } from "@/components/PlaneIcon";
 import { RunwayProgress } from "@/components/RunwayProgress";
+import { TextButton } from "@/components/TextLink";
 
 type ProgressBarProps = {
   packed: number;
@@ -30,13 +31,7 @@ export function ProgressBar({ packed, total, countId, allPacked, onForgot, messa
               All packed. Have a good trip.
             </p>
             {/* A button, since it moves focus within the page rather than going anywhere. */}
-            <button
-              type="button"
-              onClick={onForgot}
-              className="inline-flex min-h-11 cursor-pointer items-center rounded text-ink underline underline-offset-4 hover:decoration-2 active:text-muted"
-            >
-              Forgot something? Add it
-            </button>
+            <TextButton onClick={onForgot}>Forgot something? Add it</TextButton>
           </div>
         )}
       </div>

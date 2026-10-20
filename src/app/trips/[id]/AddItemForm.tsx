@@ -2,6 +2,7 @@ import { useId, useState, type FormEvent, type RefObject } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { SelectField, TextField } from "@/components/Field";
+import { SectionHeading } from "@/components/SectionHeading";
 import { SECTIONS, type Item, type Section } from "@/lib/storage";
 import { cleanName, itemNameError } from "@/lib/trips";
 
@@ -44,9 +45,9 @@ export function AddItemForm({ items, onAdd, onError, inputRef, forgotMode }: Add
   return (
     <Card>
       <form noValidate onSubmit={submit} aria-labelledby={headingId} className="flex flex-col gap-4">
-        <h2 id={headingId} className="font-display text-2xl font-semibold uppercase tracking-wide">
+        <SectionHeading id={headingId}>
           {forgotMode ? "Forgot something?" : "Add an item"}
-        </h2>
+        </SectionHeading>
         <TextField
           ref={inputRef}
           label="Item name"

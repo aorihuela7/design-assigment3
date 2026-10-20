@@ -7,6 +7,7 @@ import { Card } from "@/components/Card";
 import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
+import { SectionHeading } from "@/components/SectionHeading";
 import { uniqueCodes } from "@/lib/codes";
 import { clearFlash, peekFlash } from "@/lib/flash";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
@@ -109,7 +110,7 @@ export function MyTrips() {
       {trips.length === 0 ? (
         // Only after the person deleted every list; starters never come back on their own.
         <Card className="flex flex-col gap-4">
-          <h2 className="font-display text-2xl font-semibold uppercase tracking-wide">No lists yet</h2>
+          <SectionHeading>No lists yet</SectionHeading>
           <div className="flex flex-col gap-3 sm:flex-row">
             <ButtonLink variant="primary" href="/trips/new">
               New trip
