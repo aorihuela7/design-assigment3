@@ -24,7 +24,9 @@ export function PackingList() {
   const inputRef = useRef<HTMLInputElement>(null);
   // The latest change, shown in the progress bar and read out politely. After a
   // removal it carries what's needed to undo it, until the next change.
-  const [feedback, setFeedback] = useState<{ text: string; undo?: { item: Item; index: number } } | null>(null);
+  const [feedback, setFeedback] = useState<{ text: string | null; undo?: { item: Item; index: number } } | null>(
+    null,
+  );
   const setAnnouncement = (text: string) => setFeedback({ text });
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
@@ -134,7 +136,7 @@ export function PackingList() {
         countId={COUNT_ID}
         allPacked={allPacked}
         message={
-          feedback && (
+          feedback?.text && (
             <>
               <p>{feedback.text}</p>
               {feedback.undo && (
@@ -166,7 +168,14 @@ export function PackingList() {
         </section>
       )}
 
-      <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} forgotMode={allPacked} />
+      <AddItemForm
+        items={trip.items}
+        onAdd={add}
+        // Clears the bar's message; a pending Undo row stays, since nothing in the list changed.
+        onError={() => setFeedback((current) => (current?.undo ? { ...current, text: null } : null))}
+        inputRef={inputRef}
+        forgotMode={allPacked}
+      />
 
       {trip.items.length === 0 && !pending && (
         <Card>

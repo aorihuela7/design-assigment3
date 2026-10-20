@@ -8,6 +8,8 @@ import { cleanName, itemNameError } from "@/lib/trips";
 type AddItemFormProps = {
   items: Item[];
   onAdd: (name: string, section: Section) => void;
+  // A new error replaces whatever the progress bar was saying.
+  onError: () => void;
   inputRef: RefObject<HTMLInputElement | null>;
   // The list is fully packed: what's added now is for next time.
   forgotMode: boolean;
@@ -15,7 +17,7 @@ type AddItemFormProps = {
 
 const sectionOptions = SECTIONS.map(({ value, label }) => ({ value, label }));
 
-export function AddItemForm({ items, onAdd, inputRef, forgotMode }: AddItemFormProps) {
+export function AddItemForm({ items, onAdd, onError, inputRef, forgotMode }: AddItemFormProps) {
   const headingId = useId();
   const [name, setName] = useState("");
   // Last section picked on this page; Clothes on arrival. Not saved.
@@ -29,6 +31,7 @@ export function AddItemForm({ items, onAdd, inputRef, forgotMode }: AddItemFormP
     event.preventDefault();
     if (itemNameError(name, items)) {
       setAttemptedIn(forgotMode); // keeps exactly what was typed
+      onError();
       inputRef.current?.focus();
       return;
     }
