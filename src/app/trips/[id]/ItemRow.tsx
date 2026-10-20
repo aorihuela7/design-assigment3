@@ -43,3 +43,18 @@ export function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
     </li>
   );
 }
+
+export const UNDO_ROW_ID = "undo-removed-item";
+
+// Takes the removed item's place until the next change, so Undo is right where
+// the item was, for pointer and keyboard alike.
+export function RemovedRow({ name, onUndo }: { name: string; onUndo: () => void }) {
+  return (
+    <li className="flex min-h-11 items-center gap-3 px-4 py-1 text-muted">
+      <span className="min-w-0 flex-1 wrap-anywhere">Removed {name}</span>
+      <Button id={UNDO_ROW_ID} aria-label={`Undo removing ${name}`} onClick={onUndo} className="shrink-0">
+        Undo
+      </Button>
+    </li>
+  );
+}

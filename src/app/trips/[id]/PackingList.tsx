@@ -12,7 +12,7 @@ import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } f
 import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
-import { ItemRow } from "./ItemRow";
+import { ItemRow, RemovedRow, UNDO_ROW_ID } from "./ItemRow";
 import { ProgressBar } from "./ProgressBar";
 
 const COUNT_ID = "packed-count";
@@ -41,8 +41,11 @@ export function PackingList() {
   const isEmpty = trip?.items.length === 0;
   const hasTrip = Boolean(trip);
   // Otherwise focus starts on the list name, so the next Tab reaches "Back to My trips".
+  // Only on arrival: later changes (like removing the last item) manage focus themselves.
+  const arrived = useRef(false);
   useEffect(() => {
-    if (!hasTrip) return;
+    if (!hasTrip || arrived.current) return;
+    arrived.current = true;
     if (isEmpty || wantsAdd) inputRef.current?.focus();
     else document.getElementById(PAGE_TITLE_ID)?.focus({ preventScroll: true });
   }, [hasTrip, isEmpty, wantsAdd]);
@@ -87,14 +90,11 @@ export function PackingList() {
     // Visible too: the new row may be far down the page.
     setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
+  // A placeholder row with Undo takes the item's place (and focus) until the next change.
   const remove = (removed: Item) => {
-    // Focus goes to the next item on screen, else the previous one, else the Add item field.
-    const order = groupBySection(trip.items).flatMap((group) => group.items);
-    const index = order.findIndex((item) => item.id === removed.id);
-    const next = order[index + 1] ?? order[index - 1];
     saveItems(trip.items.filter((item) => item.id !== removed.id));
     setFeedback({ text: `Removed ${removed.name}.`, undo: { item: removed, index: trip.items.indexOf(removed) } });
-    requestAnimationFrame(() => (next ? document.getElementById(`item-${next.id}`) : inputRef.current)?.focus());
+    requestAnimationFrame(() => document.getElementById(UNDO_ROW_ID)?.focus());
   };
   // Puts the item back where it was and moves focus to it.
   const undoRemove = ({ item, index }: { item: Item; index: number }) => {
@@ -120,6 +120,11 @@ export function PackingList() {
     focusCount();
   };
   const packed = trip.items.filter((item) => item.packed).length;
+  // The removed item stays on screen as a placeholder, in its old position.
+  const pending = feedback?.undo;
+  const rows = pending
+    ? [...trip.items.slice(0, pending.index), pending.item, ...trip.items.slice(pending.index)]
+    : trip.items;
 
   return (
     <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
@@ -163,22 +168,26 @@ export function PackingList() {
 
       <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} forgotMode={allPacked} />
 
-      {trip.items.length === 0 && (
+      {trip.items.length === 0 && !pending && (
         <Card>
           <p>Nothing here yet. Add your first item.</p>
         </Card>
       )}
 
-      {groupBySection(trip.items).map((group) => (
+      {groupBySection(rows).map((group) => (
         <section key={group.section} aria-labelledby={`section-${group.section}`} className="flex flex-col gap-2">
           <h2 id={`section-${group.section}`} className="font-display text-2xl font-semibold uppercase tracking-wide">
             {group.label}
           </h2>
           <Card padded={false}>
             <ul className="divide-y divide-line">
-              {group.items.map((item) => (
-                <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} onRemove={() => remove(item)} />
-              ))}
+              {group.items.map((item) =>
+                item.id === pending?.item.id ? (
+                  <RemovedRow key={`removed-${item.id}`} name={item.name} onUndo={() => undoRemove(pending)} />
+                ) : (
+                  <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} onRemove={() => remove(item)} />
+                ),
+              )}
             </ul>
           </Card>
         </section>
