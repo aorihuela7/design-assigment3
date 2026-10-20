@@ -5,15 +5,18 @@ export const PAGE_TITLE_ID = "page-title";
 type HeaderProps = {
   // Current page name, shown large on the board and used as the page's h1.
   title: string;
+  // On My trips the home link is the current page.
+  isHome?: boolean;
 };
 
-export function Header({ title }: HeaderProps) {
+export function Header({ title, isHome = false }: HeaderProps) {
   return (
     <header data-surface="board" className="bg-board text-amber">
       <div className="mx-auto w-full max-w-225 px-4 pt-3 pb-5 sm:px-6">
         <div className="flex items-center font-mono text-xs uppercase tracking-widest">
           <Link
             href="/"
+            aria-current={isHome ? "page" : undefined}
             className="-mx-1 inline-flex min-h-11 shrink-0 items-center rounded px-1 underline-offset-4 hover:underline active:bg-amber active:text-board"
           >
             Pack Again
