@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* "Departures" theme. Only these colors exist in this app. */
+@theme {
+  --color-*: initial;
+  --color-canvas: #e8edf2;
+  --color-surface: #fbfaf6;
+  --color-ink: #0e1b2e;
+  --color-muted: #46566b;
+  --color-line: #bcc7d3;
+  --color-board: #0b1f3a;
+  --color-amber: #ffb81c; /* text on the Board band only */
+  --color-accent: #b83a0a; /* primary action only */
+  --color-accent-hover: #9c3108;
+  --color-accent-pressed: #802806;
+  --color-white: #ffffff;
+
+  --radius-*: initial;
+  --radius: 4px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-b612), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-b612-mono), ui-monospace, monospace;
+  --font-display: var(--font-barlow-condensed), ui-sans-serif, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Navy focus ring on light surfaces, amber on the Board band. */
+  :focus-visible {
+    outline: 2px solid var(--color-board);
+    outline-offset: 2px;
+  }
+
+  [data-surface="board"] :focus-visible {
+    outline-color: var(--color-amber);
+  }
 }
