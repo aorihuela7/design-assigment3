@@ -1,4 +1,4 @@
-import { SECTIONS, type Item, type Section, type StoredData } from "./storage";
+import { SECTIONS, type Item, type Section, type StoredData, type Trip } from "./storage";
 
 export type SectionGroup = { section: Section; label: string; items: Item[] };
 
@@ -22,12 +22,18 @@ export function isAllPacked(items: Item[]) {
 // Replaces one trip's items and stamps updatedAt, ready to save. On the change that
 // makes the list fully packed (not on page loads), it also records lastPackedAt and
 // clears the New marks.
-export function withItems(data: StoredData, tripId: string, items: Item[]): StoredData {
+export function withItems(
+  data: StoredData,
+  tripId: string,
+  items: Item[],
+  changes: Partial<Pick<Trip, "promptDismissedAt">> = {},
+): StoredData {
   const now = new Date().toISOString();
   return {
     ...data,
-    trips: data.trips.map((trip) => {
-      if (trip.id !== tripId) return trip;
+    trips: data.trips.map((t) => {
+      if (t.id !== tripId) return t;
+      const trip = { ...t, ...changes };
       if (!isAllPacked(trip.items) && isAllPacked(items)) {
         return {
           ...trip,
@@ -59,4 +65,9 @@ export function itemNameError(name: string, items: Item[]): string | null {
     return `${existing.name} is already in ${section}`;
   }
   return null;
+}
+
+// Unticks everything for the next trip; New marks and lastPackedAt stay.
+export function untickAll(items: Item[]): Item[] {
+  return items.map((item) => ({ ...item, packed: false }));
 }

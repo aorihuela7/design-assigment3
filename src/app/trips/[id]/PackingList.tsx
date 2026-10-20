@@ -2,16 +2,19 @@
 
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { RunwayProgress } from "@/components/RunwayProgress";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
-import { groupBySection, isAllPacked, withItems } from "@/lib/trips";
+import { groupBySection, isAllPacked, untickAll, withItems } from "@/lib/trips";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow } from "./ItemRow";
+
+const COUNT_ID = "packed-count";
 
 export function PackingList() {
   const { id } = useParams<{ id: string }>();
@@ -83,12 +86,17 @@ export function PackingList() {
     setAnnouncement(`Removed ${removed.name}`);
     requestAnimationFrame(() => (next ? document.getElementById(`item-${next.id}`) : inputRef.current)?.focus());
   };
+  const clearTicks = () => {
+    saveItems(untickAll(trip.items));
+    setAnnouncement("Ticks cleared");
+    requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
+  };
   const packed = trip.items.filter((item) => item.packed).length;
 
   return (
     <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
       <div>
-        <RunwayProgress packed={packed} total={trip.items.length} />
+        <RunwayProgress packed={packed} total={trip.items.length} countId={COUNT_ID} />
         {/* Always rendered, so the message is announced when it appears. Inside the page, not a modal. */}
         <div role="status">
           {allPacked && (
@@ -125,6 +133,14 @@ export function PackingList() {
           </Card>
         </section>
       ))}
+
+      {trip.items.length > 0 && (
+        <div>
+          <Button onClick={clearTicks} disabled={packed === 0}>
+            Clear all ticks
+          </Button>
+        </div>
+      )}
     </Page>
   );
 }

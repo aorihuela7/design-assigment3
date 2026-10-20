@@ -1,11 +1,13 @@
 type RunwayProgressProps = {
   packed: number;
   total: number;
+  // Lets a page move focus to the count, e.g. after clearing ticks.
+  countId?: string;
 };
 
 const PLANE_SIZE = 24;
 
-export function RunwayProgress({ packed, total }: RunwayProgressProps) {
+export function RunwayProgress({ packed, total, countId }: RunwayProgressProps) {
   const percent = total > 0 ? Math.min(100, Math.max(0, (packed / total) * 100)) : 0;
   return (
     <div className="flex items-center gap-3">
@@ -24,7 +26,11 @@ export function RunwayProgress({ packed, total }: RunwayProgressProps) {
           />
         </svg>
       </div>
-      <p className="font-mono text-xs whitespace-nowrap uppercase tracking-wider text-ink">
+      <p
+        id={countId}
+        tabIndex={countId ? -1 : undefined}
+        className="rounded font-mono text-xs whitespace-nowrap uppercase tracking-wider text-ink"
+      >
         {packed} of {total} packed
       </p>
     </div>
