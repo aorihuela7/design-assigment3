@@ -2,16 +2,22 @@
 
 import { useEffect } from "react";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
-import { ButtonLink } from "@/components/Button";
+import { Button, ButtonLink } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
-import { createIfMissing, useStorage, type Trip } from "@/lib/storage";
+import { createIfMissing, saveData, useStorage, type StoredData, type Trip } from "@/lib/storage";
 
 function newestFirst(a: Trip, b: Trip) {
   return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+}
+
+function addStartersBack(data: StoredData) {
+  saveData({ ...data, trips: createStarterTrips() });
+  // The button is gone now; move focus to the first list instead of losing it.
+  requestAnimationFrame(() => document.querySelector<HTMLElement>("[data-card-link]")?.focus());
 }
 
 // Same on the server and the first client render, so hydration matches.
@@ -61,7 +67,8 @@ export function MyTrips() {
     );
   }
 
-  const { trips } = storage.data;
+  const { data } = storage;
+  const { trips } = data;
   // Codes come from storage order, so they stay put when the sort changes.
   const codes = uniqueCodes(trips);
 
@@ -79,27 +86,42 @@ export function MyTrips() {
 
       {isUntouchedStarters(trips) && <p className="-mt-2 text-muted">Starter lists. Open one, make it yours.</p>}
 
-      <ul className="flex flex-col gap-4">
-        {[...trips].sort(newestFirst).map((trip) => (
-          <li key={trip.id}>
-            <BoardingPassCard
-              name={trip.name}
-              code={codes.get(trip.id) ?? ""}
-              packed={trip.items.filter((item) => item.packed).length}
-              total={trip.items.length}
-              lastPackedAt={trip.lastPackedAt}
-              newCount={trip.items.filter((item) => item.isNew).length}
-              href={`/trips/${trip.id}`}
-            />
-          </li>
-        ))}
-      </ul>
+      {trips.length === 0 ? (
+        // Only after the person deleted every list; starters never come back on their own.
+        <Card className="flex flex-col gap-4">
+          <h2 className="font-display text-2xl font-semibold uppercase tracking-wide">No lists yet</h2>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <ButtonLink variant="primary" href="/trips/new">
+              New trip type
+            </ButtonLink>
+            <Button onClick={() => addStartersBack(data)}>Add the starter lists back</Button>
+          </div>
+        </Card>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-4">
+            {[...trips].sort(newestFirst).map((trip) => (
+              <li key={trip.id}>
+                <BoardingPassCard
+                  name={trip.name}
+                  code={codes.get(trip.id) ?? ""}
+                  packed={trip.items.filter((item) => item.packed).length}
+                  total={trip.items.length}
+                  lastPackedAt={trip.lastPackedAt}
+                  newCount={trip.items.filter((item) => item.isNew).length}
+                  href={`/trips/${trip.id}`}
+                />
+              </li>
+            ))}
+          </ul>
 
-      <div>
-        <ButtonLink variant="primary" href="/trips/new">
-          New trip type
-        </ButtonLink>
-      </div>
+          <div>
+            <ButtonLink variant="primary" href="/trips/new">
+              New trip type
+            </ButtonLink>
+          </div>
+        </>
+      )}
 
       {storage.problem !== "blocked" && <p className="mt-auto text-sm text-muted">Saved on this device.</p>}
     </Page>
