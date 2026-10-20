@@ -45,7 +45,9 @@ export function AddItemForm({ items, onAdd, onError, inputRef, forgotMode }: Add
   return (
     <Card>
       <form noValidate onSubmit={submit} aria-labelledby={headingId} className="flex flex-col gap-4">
-        <SectionHeading id={headingId}>
+        {/* "Add an item" only repeats the button, so it's for screen readers; the
+            Forgot something? heading changes what the form does, so it shows. */}
+        <SectionHeading id={headingId} className={forgotMode ? "" : "sr-only"}>
           {forgotMode ? "Forgot something?" : "Add an item"}
         </SectionHeading>
         <TextField
