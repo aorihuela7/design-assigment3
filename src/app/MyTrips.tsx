@@ -103,7 +103,8 @@ export function MyTrips() {
           {/* The primary action stays at the top, beside the intro on wide screens. */}
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             {intro && <p className="text-muted">{intro}</p>}
-            <ButtonLink variant="primary" href="/trips/new" className="sm:ml-auto">
+            {/* Right of the intro when there is one; otherwise left, so no empty gap. */}
+            <ButtonLink variant="primary" href="/trips/new" className={intro ? "sm:ml-auto" : ""}>
               New trip
             </ButtonLink>
           </div>
