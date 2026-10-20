@@ -43,6 +43,15 @@ export function MyTrips() {
     createIfMissing(createStarterTrips);
   }, []);
 
+  // Saved by a newer version of the app: show nothing that could write over it.
+  if (storage.status === "ready" && storage.problem === "newer") {
+    return (
+      <Page title="My trips">
+        <Notice>Your lists were saved by a newer version of Pack Again. Reload the page to open them.</Notice>
+      </Page>
+    );
+  }
+
   // Also covers the moment before the starter lists are created.
   if (storage.status === "loading" || storage.data === null) {
     return (
