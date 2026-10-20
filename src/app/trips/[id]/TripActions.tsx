@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { TextField } from "@/components/Field";
+import { TextButton } from "@/components/TextLink";
 import { tripNameMessage } from "@/components/tripNameMessage";
 import type { Trip } from "@/lib/storage";
 import { cleanName, tripNameProblem } from "@/lib/trips";
@@ -47,19 +48,23 @@ export function TripActions({ trip, otherTrips, packed, onClearTicks, onRename, 
     );
   }
 
+  // Clearing ticks is part of packing; renaming and deleting are rare, so they're
+  // quieter text actions under a divider.
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-col items-start gap-4">
       {trip.items.length > 0 && (
         <Button onClick={onClearTicks} disabled={packed === 0}>
           Clear all ticks
         </Button>
       )}
-      <Button ref={renameButton} onClick={() => setMode("rename")}>
-        Rename trip
-      </Button>
-      <Button ref={deleteButton} onClick={() => setMode("delete")}>
-        Delete trip
-      </Button>
+      <div className="flex w-full flex-wrap gap-x-6 border-t border-line pt-2">
+        <TextButton ref={renameButton} onClick={() => setMode("rename")}>
+          Rename trip
+        </TextButton>
+        <TextButton ref={deleteButton} onClick={() => setMode("delete")}>
+          Delete trip
+        </TextButton>
+      </div>
     </div>
   );
 }
