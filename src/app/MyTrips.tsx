@@ -9,6 +9,8 @@ import { StorageNotice } from "@/components/StorageNotice";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
 import { createIfMissing, saveData, useStorage, type StoredData, type Trip } from "@/lib/storage";
+import { welcomeBackCount } from "@/lib/trips";
+import { useNow } from "@/lib/useNow";
 
 function newestFirst(a: Trip, b: Trip) {
   return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
@@ -43,6 +45,7 @@ function Loading() {
 
 export function MyTrips() {
   const storage = useStorage();
+  const now = useNow();
 
   // First visit: the lists are there right away, nothing asked first.
   useEffect(() => {
@@ -71,6 +74,14 @@ export function MyTrips() {
   const { trips } = data;
   // Codes come from storage order, so they stay put when the sort changes.
   const codes = uniqueCodes(trips);
+  // One line under the title at most: welcome back wins over the starter line.
+  const readyAgain = now === null ? 0 : welcomeBackCount(trips, now);
+  const intro =
+    readyAgain > 0
+      ? `Welcome back. ${readyAgain} ${readyAgain === 1 ? "list" : "lists"} ready to pack again.`
+      : isUntouchedStarters(trips)
+        ? "Starter lists. Open one, make it yours."
+        : null;
 
   return (
     <Page title="My trips">
@@ -91,7 +102,7 @@ export function MyTrips() {
         <>
           {/* The primary action stays at the top, beside the intro on wide screens. */}
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {isUntouchedStarters(trips) && <p className="text-muted">Starter lists. Open one, make it yours.</p>}
+            {intro && <p className="text-muted">{intro}</p>}
             <ButtonLink variant="primary" href="/trips/new" className="sm:ml-auto">
               New trip type
             </ButtonLink>

@@ -83,3 +83,12 @@ export function shouldAskNewTrip(trip: Trip, now: number) {
   if (!trip.items.some((item) => item.packed)) return false;
   return !trip.promptDismissedAt || Date.parse(trip.promptDismissedAt) < lastPacked;
 }
+
+// "Welcome back": lists packed before, when nothing changed for over 2 days.
+// Returns how many lists are ready to pack again, or 0 when the line shouldn't show.
+export function welcomeBackCount(trips: Trip[], now: number) {
+  const packedBefore = trips.filter((trip) => trip.lastPackedAt).length;
+  if (packedBefore === 0) return 0;
+  const lastActivity = Math.max(...trips.map((trip) => Date.parse(trip.updatedAt)));
+  return now - lastActivity > TWO_DAYS ? packedBefore : 0;
+}
