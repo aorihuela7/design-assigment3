@@ -21,8 +21,10 @@ export function PackingList() {
   const storage = useStorage();
   const now = useNow();
   const inputRef = useRef<HTMLInputElement>(null);
-  // The latest change, shown in the progress bar and read out politely.
-  const [announcement, setAnnouncement] = useState("");
+  // The latest change, shown in the progress bar and read out politely. After a
+  // removal it carries what's needed to undo it, until the next change.
+  const [feedback, setFeedback] = useState<{ text: string; undo?: { item: Item; index: number } } | null>(null);
+  const setAnnouncement = (text: string) => setFeedback({ text });
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
   // The tab title names the list too, so the person knows where they are.
@@ -68,8 +70,10 @@ export function PackingList() {
   const tripId = trip.id;
   // Every change is saved straight away.
   const saveItems = (items: Item[]) => saveData(withItems(data, tripId, items));
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
     saveItems(trip.items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
+    setFeedback(null);
+  };
   const allPacked = isAllPacked(trip.items);
   const add = (itemName: string, section: Section) => {
     // Added after a full pack ("Forgot something?"): saved as packed and New, so the
@@ -85,8 +89,16 @@ export function PackingList() {
     const index = order.findIndex((item) => item.id === removed.id);
     const next = order[index + 1] ?? order[index - 1];
     saveItems(trip.items.filter((item) => item.id !== removed.id));
-    setAnnouncement(`Removed ${removed.name}`);
+    setFeedback({ text: `Removed ${removed.name}.`, undo: { item: removed, index: trip.items.indexOf(removed) } });
     requestAnimationFrame(() => (next ? document.getElementById(`item-${next.id}`) : inputRef.current)?.focus());
+  };
+  // Puts the item back where it was and moves focus to it.
+  const undoRemove = ({ item, index }: { item: Item; index: number }) => {
+    const items = [...trip.items];
+    items.splice(index, 0, item);
+    saveItems(items);
+    setAnnouncement(`Restored ${item.name}`);
+    requestAnimationFrame(() => document.getElementById(`item-${item.id}`)?.focus());
   };
   const focusCount = () => requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
   const clearTicks = () => {
@@ -111,7 +123,21 @@ export function PackingList() {
         total={trip.items.length}
         countId={COUNT_ID}
         allPacked={allPacked}
-        message={announcement && <p>{announcement}</p>}
+        message={
+          feedback && (
+            <>
+              <p>{feedback.text}</p>
+              {feedback.undo && (
+                <Button
+                  aria-label={`Undo removing ${feedback.undo.item.name}`}
+                  onClick={() => feedback.undo && undoRemove(feedback.undo)}
+                >
+                  Undo
+                </Button>
+              )}
+            </>
+          )
+        }
       />
       <StorageNotice problem={storage.problem} />
 
