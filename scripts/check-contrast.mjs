@@ -9,6 +9,17 @@ const colors = Object.fromEntries(
   [...css.matchAll(/--color-([a-z-]+):\s*(#[0-9a-f]{6})/gi)].map(([, name, hex]) => [name, hex]),
 );
 
+// Tints used in the app, as blends of two tokens: [name, top color, opacity, bottom color].
+const blends = [["stub", "canvas", 0.6, "surface"]]; // boarding pass stub: bg-canvas/60 on a card
+for (const [name, top, alpha, bottom] of blends) {
+  const mix = [1, 3, 5].map((i) => {
+    const a = parseInt(colors[top].slice(i, i + 2), 16);
+    const b = parseInt(colors[bottom].slice(i, i + 2), 16);
+    return Math.round(a * alpha + b * (1 - alpha)).toString(16).padStart(2, "0");
+  });
+  colors[name] = `#${mix.join("")}`;
+}
+
 const TEXT = 4.5; // normal text
 const LARGE = 3; // text at least 24px, or 18.66px bold
 const UI = 3; // borders, focus rings and icons needed to understand a control (WCAG 1.4.11)
@@ -21,6 +32,8 @@ const pairs = [
   ["Text", "ink", "line", TEXT, "Secondary and quiet buttons, pressed"],
   ["Text", "muted", "canvas", TEXT, "Intro line, Saved on this device, loading text, BackLink pressed"],
   ["Text", "muted", "surface", TEXT, "Code label, Last packed, placeholder, packed (struck) items"],
+  ["Text", "ink", "stub", TEXT, "Boarding pass stub: count, Open"],
+  ["Text", "muted", "stub", TEXT, "Boarding pass stub: Last packed"],
   ["Text", "amber", "board", TEXT, "Header: PACK AGAIN link"],
   ["Text", "board", "amber", TEXT, "Header link, pressed"],
   ["Text", "white", "accent", TEXT, "Primary button"],

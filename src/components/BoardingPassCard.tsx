@@ -76,7 +76,7 @@ export function BoardingPassCard({
           <span className={`${notch} ${notchEnd}`} />
         </div>
 
-        <div className="flex flex-col justify-center gap-2 p-4 @md:w-64 @md:p-5">
+        <div className="flex flex-col justify-center gap-2 rounded-b-[3px] bg-canvas/60 p-4 @md:w-64 @md:rounded-r-[3px] @md:rounded-bl-none @md:p-5">
           <RunwayProgress packed={packed} total={total} />
           {lastPackedAt && (
             <p className="font-mono text-xs uppercase tracking-wider text-muted">
