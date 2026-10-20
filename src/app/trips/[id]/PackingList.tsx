@@ -4,9 +4,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
-import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
-import { RunwayProgress } from "@/components/RunwayProgress";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
 import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
@@ -14,6 +12,7 @@ import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow } from "./ItemRow";
+import { ProgressBar } from "./ProgressBar";
 
 const COUNT_ID = "packed-count";
 
@@ -106,17 +105,7 @@ export function PackingList() {
 
   return (
     <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
-      <div>
-        <RunwayProgress packed={packed} total={trip.items.length} countId={COUNT_ID} />
-        {/* Always rendered, so the message is announced when it appears. Inside the page, not a modal. */}
-        <div role="status">
-          {allPacked && (
-            <div className="mt-4">
-              <Notice live={false}>All packed. Have a good trip.</Notice>
-            </div>
-          )}
-        </div>
-      </div>
+      <ProgressBar packed={packed} total={trip.items.length} countId={COUNT_ID} allPacked={allPacked} />
       <StorageNotice problem={storage.problem} />
       <p aria-live="polite" className="sr-only">
         {announcement}
