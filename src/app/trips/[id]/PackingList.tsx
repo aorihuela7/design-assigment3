@@ -33,6 +33,8 @@ export function PackingList() {
     null,
   );
   const setAnnouncement = (text: string) => setFeedback({ text });
+  // The row just added or restored, so it can be highlighted where it lands.
+  const [arrivedId, setArrivedId] = useState<string | null>(null);
 
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
@@ -97,15 +99,18 @@ export function PackingList() {
   const toggle = (id: string) => {
     change((items) => items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
     setFeedback(null);
+    setArrivedId(null);
   };
   const allPacked = isAllPacked(trip.items);
   const add = (itemName: string, section: Section) => {
     // Added after a full pack ("Forgot something?"): saved as packed and New, so the
     // list stays All packed and the item stands out next trip.
+    const id = createId();
     change((items) => {
       const forgot = isAllPacked(items);
-      return [...items, { id: createId(), name: itemName, section, packed: forgot, isNew: forgot }];
+      return [...items, { id, name: itemName, section, packed: forgot, isNew: forgot }];
     });
+    setArrivedId(id);
     // Visible too: the new row may be far down the page.
     setAnnouncement(`Added ${itemName} to ${SECTIONS.find((s) => s.value === section)?.label ?? "Other"}`);
   };
@@ -117,6 +122,7 @@ export function PackingList() {
       return items.filter((item) => item.id !== removed.id);
     });
     setFeedback({ text: `Removed ${removed.name}`, undo: { item: removed, index } });
+    setArrivedId(null);
     requestAnimationFrame(() => document.getElementById(UNDO_ROW_ID)?.focus());
   };
   // Puts the item back where it was and moves focus to it.
@@ -125,6 +131,7 @@ export function PackingList() {
       items.some((i) => i.id === item.id) ? items : [...items.slice(0, index), item, ...items.slice(index)],
     );
     setAnnouncement(`Restored ${item.name}`);
+    setArrivedId(item.id);
     requestAnimationFrame(() => document.getElementById(`item-${item.id}`)?.focus());
   };
   const focusCount = () => requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
@@ -235,7 +242,13 @@ export function PackingList() {
                 item.id === pending?.item.id ? (
                   <RemovedRow key={`removed-${item.id}`} name={item.name} onUndo={() => undoRemove(pending)} />
                 ) : (
-                  <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} onRemove={() => remove(item)} />
+                  <ItemRow
+                    key={item.id}
+                    item={item}
+                    arrived={item.id === arrivedId}
+                    onToggle={() => toggle(item.id)}
+                    onRemove={() => remove(item)}
+                  />
                 ),
               )}
             </ul>

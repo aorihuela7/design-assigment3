@@ -17,6 +17,21 @@
 
   --radius-*: initial;
   --radius: 4px;
+
+  /* A just-added or restored row: brief tint and an ink edge, then nothing.
+     Used with motion-safe: only, so reduced motion means no animation. */
+  --animate-arrive: arrive 1.8s ease-out;
+
+  @keyframes arrive {
+    from {
+      background-color: var(--color-canvas);
+      box-shadow: inset 4px 0 0 var(--color-ink);
+    }
+    to {
+      background-color: transparent;
+      box-shadow: inset 4px 0 0 transparent;
+    }
+  }
 }
 
 @theme inline {

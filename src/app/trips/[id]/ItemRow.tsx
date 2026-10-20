@@ -6,12 +6,14 @@ type ItemRowProps = {
   item: Item;
   onToggle: () => void;
   onRemove: () => void;
+  // Just added or restored: plays the arrive highlight once.
+  arrived?: boolean;
 };
 
 // The whole row is the checkbox's label, so the hit area is at least 44px high.
-export function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
+export function ItemRow({ item, onToggle, onRemove, arrived = false }: ItemRowProps) {
   return (
-    <li className="flex items-center gap-2 px-2">
+    <li className={`flex items-center gap-2 px-2 ${arrived ? "motion-safe:animate-arrive" : ""}`}>
       <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded px-2 py-2 hover:bg-canvas">
         <span className="relative flex size-6 shrink-0">
           <input
