@@ -22,7 +22,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Pack Again",
+  title: { default: "Pack Again", template: "%s · Pack Again" },
   description: "Packing lists for trips you repeat.",
 };
 
