@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type RefObject } from "react";
+import { useId, useState, type FormEvent, type RefObject } from "react";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { SelectField, TextField } from "@/components/Field";
@@ -9,11 +9,14 @@ type AddItemFormProps = {
   items: Item[];
   onAdd: (name: string, section: Section) => void;
   inputRef: RefObject<HTMLInputElement | null>;
+  // The list is fully packed: what's added now is for next time.
+  forgotMode: boolean;
 };
 
 const sectionOptions = SECTIONS.map(({ value, label }) => ({ value, label }));
 
-export function AddItemForm({ items, onAdd, inputRef }: AddItemFormProps) {
+export function AddItemForm({ items, onAdd, inputRef, forgotMode }: AddItemFormProps) {
+  const headingId = useId();
   const [name, setName] = useState("");
   // Last section picked on this page; Clothes on arrival. Not saved.
   const [section, setSection] = useState<Section>("clothes");
@@ -36,7 +39,10 @@ export function AddItemForm({ items, onAdd, inputRef }: AddItemFormProps) {
 
   return (
     <Card>
-      <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+      <form noValidate onSubmit={submit} aria-labelledby={headingId} className="flex flex-col gap-4">
+        <h2 id={headingId} className="font-display text-2xl font-semibold uppercase tracking-wide">
+          {forgotMode ? "Forgot something?" : "Add an item"}
+        </h2>
         <TextField
           ref={inputRef}
           label="Item name"
@@ -53,7 +59,7 @@ export function AddItemForm({ items, onAdd, inputRef }: AddItemFormProps) {
         />
         <div>
           <Button type="submit" variant="primary">
-            Add item
+            {forgotMode ? "Add it for next time" : "Add item"}
           </Button>
         </div>
       </form>

@@ -66,8 +66,12 @@ export function PackingList() {
   const saveItems = (items: Item[]) => saveData(withItems(data, tripId, items));
   const toggle = (id: string) =>
     saveItems(trip.items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
+  const allPacked = isAllPacked(trip.items);
   const add = (itemName: string, section: Section) => {
-    saveItems([...trip.items, { id: createId(), name: itemName, section, packed: false, isNew: false }]);
+    // Added after a full pack ("Forgot something?"): saved as packed and New, so the
+    // list stays All packed and the item stands out next trip.
+    const item = { id: createId(), name: itemName, section, packed: allPacked, isNew: allPacked };
+    saveItems([...trip.items, item]);
     setAnnouncement(`Added ${itemName}`);
   };
   const remove = (removed: Item) => {
@@ -87,7 +91,7 @@ export function PackingList() {
         <RunwayProgress packed={packed} total={trip.items.length} />
         {/* Always rendered, so the message is announced when it appears. Inside the page, not a modal. */}
         <div role="status">
-          {isAllPacked(trip.items) && (
+          {allPacked && (
             <div className="mt-4">
               <Notice live={false}>All packed. Have a good trip.</Notice>
             </div>
@@ -99,7 +103,7 @@ export function PackingList() {
         {announcement}
       </p>
 
-      <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} />
+      <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} forgotMode={allPacked} />
 
       {trip.items.length === 0 && (
         <Card>
