@@ -166,7 +166,7 @@ export function PackingList() {
               Packing for a new trip?
             </h2>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button onClick={() => answerNewTrip(true)}>Clear ticks</Button>
+              <Button onClick={() => answerNewTrip(true)}>Clear all ticks</Button>
               <Button onClick={() => answerNewTrip(false)}>Keep them</Button>
             </div>
           </Card>

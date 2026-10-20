@@ -55,7 +55,7 @@ export function BoardingPassCard({
           </h2>
           {newCount > 0 && (
             <span>
-              <NewBadge>{`${newCount} new since last trip`}</NewBadge>
+              <NewBadge>{`${newCount} added for next trip`}</NewBadge>
             </span>
           )}
           {newCount > 0 && forgotHref && (
