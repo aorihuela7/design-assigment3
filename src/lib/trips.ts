@@ -92,3 +92,16 @@ export function welcomeBackCount(trips: Trip[], now: number) {
   const lastActivity = Math.max(...trips.map((trip) => Date.parse(trip.updatedAt)));
   return now - lastActivity > TWO_DAYS ? packedBefore : 0;
 }
+
+export const MAX_TRIP_NAME = 40;
+
+export type TripNameProblem = { kind: "empty" } | { kind: "long" } | { kind: "duplicate"; trip: Trip };
+
+// Why a trip name can't be used, or null when it can.
+export function tripNameProblem(name: string, trips: Trip[]): TripNameProblem | null {
+  const clean = cleanName(name);
+  if (clean === "") return { kind: "empty" };
+  if (clean.length > MAX_TRIP_NAME) return { kind: "long" };
+  const existing = trips.find((trip) => cleanName(trip.name).toLowerCase() === clean.toLowerCase());
+  return existing ? { kind: "duplicate", trip: existing } : null;
+}
