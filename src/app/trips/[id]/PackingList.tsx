@@ -21,10 +21,11 @@ export function PackingList() {
   const trip = storage.status === "ready" ? storage.data?.trips.find((t) => t.id === id) : undefined;
 
   // The tab title names the list too, so the person knows where they are.
-  const name = trip?.name;
+  const tabTitle =
+    trip?.name ?? (storage.status === "ready" && storage.problem !== "newer" ? "List not found" : null);
   useEffect(() => {
-    if (name) document.title = `${name} · Pack Again`;
-  }, [name]);
+    if (tabTitle) document.title = `${tabTitle} · Pack Again`;
+  }, [tabTitle]);
 
   // An empty list opens ready to type the first item.
   const isEmpty = trip?.items.length === 0;
@@ -34,8 +35,25 @@ export function PackingList() {
 
   if (storage.status === "loading") return <ListLoading />;
 
+  // Saved by a newer version: nothing here can be shown or changed safely.
+  if (storage.problem === "newer") {
+    return (
+      <Page title="Packing list" back={BACK_TO_MY_TRIPS}>
+        <StorageNotice problem="newer" />
+      </Page>
+    );
+  }
+
+  // Unknown id: an old bookmark, a deleted list, or nothing saved yet.
   if (!storage.data || !trip) {
-    return <Page title="Packing list" back={BACK_TO_MY_TRIPS}>{null}</Page>;
+    return (
+      <Page title="List not found" back={BACK_TO_MY_TRIPS}>
+        <StorageNotice problem={storage.problem} />
+        <Card>
+          <p>This list doesn’t exist anymore.</p>
+        </Card>
+      </Page>
+    );
   }
 
   const { data } = storage;
