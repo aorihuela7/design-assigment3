@@ -121,7 +121,7 @@ An audit against AGENTS.md and the assignment, then the features left out of the
 - **One word for one thing:** a trip is a trip everywhere ("No trips yet", "Trip not found", "Loading your trips…"); both duplicate errors end "use another name".
 - **Shared components everywhere:** text links, text buttons and section headings now come from shared components, like buttons, fields and cards.
 - **Clearer hierarchy:** Rename and Delete are quiet text actions under Clear all ticks; the "Add an item" heading, which only repeated the button, is now for screen readers only; the boarding pass stub has its own tint.
-- **Motion where it helps:** a just-added or restored item briefly shows a tint and an ink edge; none with reduced motion.
+- **Motion where it helps:** opening a trip flies its plane down the runway first (0.35 s); ticking an item draws its check and strike-through; a just-added or restored item briefly shows a tint and an ink edge. None of it runs with reduced motion, and new-tab clicks open straight away.
 - **No dead ends:** unexpected errors get a designed page with Try again; the newer-version notice has a Reload button; the home link says it's the current page on My trips.
 
 **Choices I made along the way**
