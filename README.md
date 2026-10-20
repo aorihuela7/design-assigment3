@@ -1,6 +1,6 @@
 # Pack Again
 
-Pack Again is a packing list for trips you take again and again: a weekend at your parents', a conference, a beach weekend. If you rebuild the same list from memory each time and forget the same things, Pack Again keeps the list for you. Open it, tick items off as you pack, add anything you forgot for next time, and find the list ready when the next trip comes around. There's no account and nothing to set up: three starter lists are there on your first visit.
+Pack Again is a packing list for trips you take again and again: a weekend at your parents', a conference, a beach weekend. If you rebuild the same list from memory each time and forget the same things, Pack Again keeps the list for you. Open it, tick items off as you pack, add anything you forgot for next time, and find the list ready when the next trip comes around. There's no account and nothing to set up: three starter trips are there on your first visit.
 
 Live: https://design-assigment3.vercel.app
 
@@ -12,12 +12,12 @@ First visit, main task, coming back. Notes: [flows.md](flows.md).
 flowchart TD
   subgraph first["First visit"]
     direction TB
-    A1(["Open Pack Again"]) --> A2["Loading your lists…"]
-    A2 --> A3{"Lists saved in<br/>this browser?"}
-    A3 -- "None yet" --> A4["3 starter lists appear<br/>nothing asked first"]
+    A1(["Open Pack Again"]) --> A2["Loading your trips…"]
+    A2 --> A3{"Trips saved in<br/>this browser?"}
+    A3 -- "None yet" --> A4["3 starter trips appear<br/>nothing asked first"]
     A3 -- "Yes" --> A7
-    A3 -- "Can't read them" --> A5["Copy kept, start fresh<br/>No lists yet · Add the starter lists back"]
-    A3 -- "Browser not saving" --> A6["Lists work, with a banner:<br/>this browser isn't saving"]
+    A3 -- "Can't read them" --> A5["Copy kept, start fresh<br/>No trips yet · Add the starter trips back"]
+    A3 -- "Browser not saving" --> A6["Trips work, with a banner:<br/>this browser isn't saving"]
     A4 --> A7["My trips<br/>ticket cards, newest first"]
   end
 
@@ -28,17 +28,22 @@ flowchart TD
     B2 -- "Create trip" --> B3
     B3 -- "Add item" --> B4["Added X to Section<br/>or an error under the field"]
     B4 --> B3
-    B3 -- "Remove" --> B5["Removed X · Undo<br/>in the item's place"]
+    B3 -- "Remove" --> B5["Removed X · Undo<br/>until the next change"]
     B5 --> B3
     B3 -- "Tick every item" --> B6["All packed. Have a good trip."]
     B6 -- "Forgot something?" --> B7["Saved as packed and New,<br/>for next time"]
-    B8(["Old or wrong link"]) --> B9["List not found<br/>Back to My trips"]
+    B3 -- "Rename trip" --> B10["Trip name, in place<br/>same checks as New trip"]
+    B10 --> B3
+    B3 -- "Delete trip" --> B11{"Delete X and<br/>its items?"}
+    B11 -- "Cancel" --> B3
+    B11 -- "Delete trip" --> B12["My trips<br/>Deleted X"]
+    B8(["Old or wrong link"]) --> B9["Trip not found<br/>Back to My trips"]
   end
 
   subgraph back["Coming back"]
     direction TB
     C1(["Come back before the next trip"]) --> C2["My trips<br/>Last packed · N added for next trip"]
-    C2 -- "After 2+ days away" --> C3["Welcome back.<br/>N lists ready to pack again."]
+    C2 -- "After 2+ days away" --> C3["Welcome back.<br/>N trips ready to pack again."]
     C2 -- "Forgot something? Add it" --> C7["List opens with<br/>Add item focused"]
     C2 -- "Open the list" --> C4{"Packed over 2 days ago<br/>and still ticked?"}
     C4 -- "Yes" --> C5["Packing for a new trip?<br/>Clear all ticks · Keep them"]
@@ -67,7 +72,7 @@ Then open http://localhost:3000. `npm run check:contrast` checks the color contr
 
 An AI agent used the live app twice as a first-time user, judging only from the screen: first visit, adding items (including an empty submit and a duplicate), ticking, removing, finishing a list, adding something forgotten, coming back in a new tab, at 1440px and 390px, and once with the keyboard only. It had built the app itself, so it wasn't a truly fresh user; treat this as a first pass before testing with people.
 
-**Summary.** Useful within about 5 seconds and two clicks, with no sign-up and realistic starter lists. You always know where you are, errors appear under the field and keep what you typed, ticks don't rely on color, the lists are remembered, and the keyboard flow works. The first round's weak spots were feedback you can't see and changes you can't take back; the second round found smaller issues with keyboard reach, visual cues and wording.
+**Summary.** Useful within about 5 seconds and two clicks, with no sign-up and realistic starter trips. You always know where you are, errors appear under the field and keep what you typed, ticks don’t rely on color, your trips are remembered, and the keyboard flow works. The first round's weak spots were feedback you can't see and changes you can't take back; the second round found smaller issues with keyboard reach, visual cues and wording.
 
 **Round 1: the 5 problems, most severe first**
 
@@ -89,7 +94,7 @@ An AI agent used the live app twice as a first-time user, judging only from the 
 
 | Problem | Decision | What changed |
 |---|---|---|
-| Permanent removal | Fixed | "Removed Socks." with Undo in the bar, and a "Removed Socks · Undo" row in the item's place, with Undo focused. Both disappear 5 seconds after you move away from them (hovering or keyboard focus keeps them), or at your next change. Undo puts the item back and focuses it. |
+| Permanent removal | Fixed | A "Removed Socks · Undo" row in the item's place, with Undo focused, and the same Undo in the bar. Both stay until your next change to the list. Undo puts the item back and focuses it. |
 | New marks erased | Fixed | New marks clear only when the next trip is packed (after Clear all ticks), not when you re-tick within the same trip. |
 | Success off screen | Fixed | The count, plane and "All packed" sit in a bar that sticks to the top as you scroll. |
 | No add confirmation | Fixed | The bar shows "Added Sunglasses to Other" on screen, not only to screen readers. |
@@ -105,13 +110,29 @@ An AI agent used the live app twice as a first-time user, judging only from the 
 | On phones the form sits above the list | Left for later | The list is reachable by scrolling and the bar shows progress; collapsing the form is a bigger layout change. |
 | Item names can't be edited | Left for later | Remove and add again works, and Undo makes removing safe; editing would add a form state to every row. |
 
+**Final polish (after the two rounds)**
+
+An audit against AGENTS.md and the assignment, then the features left out of the plan:
+
+- **Undo has no timer.** An earlier 5-second fade was removed: it could take Undo away from someone slower or using a screen reader. The row stays until the next change.
+- **Rename trip**, in place, with the same checks and messages as New trip. Escape cancels; focus returns to the button.
+- **Delete trip**, with a confirmation in place ("Delete Beach weekend and its 15 items? This can't be undone."), not a modal. Focus goes to the question, so an extra Enter can't delete; afterwards My trips says "Deleted …" and focus lands there.
+- **Tabs stay in sync.** Every change is applied to what's saved at that moment, so two open tabs, or two quick changes, never overwrite each other.
+- **One word for one thing:** a trip is a trip everywhere ("No trips yet", "Trip not found", "Loading your trips…"); both duplicate errors end "use another name".
+- **Shared components everywhere:** text links, text buttons and section headings now come from shared components, like buttons, fields and cards.
+- **Clearer hierarchy:** Rename and Delete are quiet text actions under Clear all ticks; the "Add an item" heading, which only repeated the button, is now for screen readers only; the boarding pass stub has its own tint.
+- **Motion where it helps:** a just-added or restored item briefly shows a tint and an ink edge; none with reduced motion.
+- **No dead ends:** unexpected errors get a designed page with Try again; the newer-version notice has a Reload button; the home link says it's the current page on My trips.
+
 **Choices I made along the way**
 
 - An empty list still focuses the Add item field when it opens, instead of the list name, because typing the first item is the only thing to do there.
 - "Forgot something? Add it" is a button styled as a link, because it moves focus within the page rather than going to another page.
+- Deleting a trip asks first instead of offering Undo: it removes a whole list, and the question is in place, not a modal.
+- Save in Rename and the Delete trip confirmation use the secondary button, so Add item stays the only accent on a list page.
 
 ## What it remembers
 
-Everything stays in your browser's local storage under `pack-again:v1`: your lists, their items and sections, which items are ticked or marked New, when each list was last packed, when you cleared the ticks, and whether you answered "Packing for a new trip?". If saved data can't be read, a copy is kept under `pack-again:backup` before starting fresh.
+Everything stays in your browser's local storage under `pack-again:v1`: your trips, their items and sections, which items are ticked or marked New, when each trip was last packed, when you cleared the ticks, and whether you answered "Packing for a new trip?". If saved data can't be read, a copy is kept under `pack-again:backup` before starting fresh.
 
-Nothing leaves your device: no account, no server, no analytics, and the fonts are bundled with the app. Lists don't sync to other browsers or devices, and clearing your browser's site data deletes them.
+Nothing leaves your device: no account, no server, no analytics, and the fonts are bundled with the app. Tabs in the same browser stay in sync, but trips don't sync to other browsers or devices, and clearing your browser's site data deletes them.
