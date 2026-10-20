@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { BoardingPassCard } from "@/components/BoardingPassCard";
 import { ButtonLink } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { uniqueCodes } from "@/lib/codes";
 import { createStarterTrips, isUntouchedStarters } from "@/lib/starters";
@@ -57,6 +58,13 @@ export function MyTrips() {
 
   return (
     <Page title="My trips">
+      {storage.problem === "blocked" && (
+        <Notice>This browser isn’t saving. Your lists will disappear when you close it.</Notice>
+      )}
+      {storage.problem === "full" && (
+        <Notice>Your last change wasn’t saved because this browser’s storage is full.</Notice>
+      )}
+
       {isUntouchedStarters(trips) && <p className="-mt-2 text-muted">Starter lists. Open one, make it yours.</p>}
 
       <ul className="flex flex-col gap-4">
@@ -81,7 +89,7 @@ export function MyTrips() {
         </ButtonLink>
       </div>
 
-      <p className="mt-auto text-sm text-muted">Saved on this device.</p>
+      {storage.problem !== "blocked" && <p className="mt-auto text-sm text-muted">Saved on this device.</p>}
     </Page>
   );
 }
