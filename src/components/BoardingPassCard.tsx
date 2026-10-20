@@ -11,7 +11,7 @@ type BoardingPassCardProps = {
   lastPackedAt: string | null;
   newCount?: number;
   // The list name links here; the link's hit area covers the whole card.
-  href?: string;
+  href: string;
   // Second link, shown with new items: opens the list ready to add one.
   forgotHref?: string;
 };
@@ -44,14 +44,14 @@ export function BoardingPassCard({
   forgotHref,
 }: BoardingPassCardProps) {
   return (
-    <Card interactive={Boolean(href)} padded={false} className="@container">
+    <Card interactive padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-1 p-4 @md:p-5">
           <span aria-hidden="true" className="font-mono text-xs tracking-widest text-muted">
             {code}
           </span>
           <h2 className="font-display text-3xl leading-tight font-semibold uppercase tracking-wide break-words text-ink @md:text-4xl">
-            {href ? <CardLink href={href}>{name}</CardLink> : name}
+            <CardLink href={href}>{name}</CardLink>
           </h2>
           {newCount > 0 && (
             <span>
@@ -71,7 +71,7 @@ export function BoardingPassCard({
 
         <div
           aria-hidden="true"
-          className={`pointer-events-none relative h-0 @md:h-auto @md:w-0 ${href ? "text-line group-hover:text-ink" : "text-line"}`}
+          className="pointer-events-none relative h-0 text-line group-hover:text-ink @md:h-auto @md:w-0"
         >
           <div className="absolute inset-x-5 top-0 border-t border-dashed border-line @md:inset-x-auto @md:inset-y-5 @md:left-0 @md:border-t-0 @md:border-l" />
           <span className={`${notch} ${notchStart}`} />
@@ -85,12 +85,10 @@ export function BoardingPassCard({
               Last packed {formatDay(lastPackedAt)}
             </p>
           )}
-          {href && (
-            // Visual cue only; the list name is the link's accessible name.
-            <span aria-hidden="true" className="self-end font-mono text-xs uppercase tracking-wider text-ink">
-              Open →
-            </span>
-          )}
+          {/* Visual cue only; the list name is the link's accessible name. */}
+          <span aria-hidden="true" className="self-end font-mono text-xs uppercase tracking-wider text-ink">
+            Open →
+          </span>
         </div>
       </div>
     </Card>

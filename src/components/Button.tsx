@@ -20,7 +20,6 @@ const linkVariants = {
   primary:
     "border-accent bg-accent text-white hover:border-accent-hover hover:bg-accent-hover active:border-accent-pressed active:bg-accent-pressed",
   secondary: "border-ink bg-surface text-ink hover:bg-canvas active:bg-line",
-  quiet: "border-transparent bg-transparent text-ink hover:border-ink active:bg-line",
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
@@ -36,7 +35,7 @@ export function Button({ variant = "secondary", type = "button", className = "",
 }
 
 // A link that looks like a button, for actions that go to another page.
-type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: Variant };
+type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: keyof typeof linkVariants };
 
 export function ButtonLink({ variant = "secondary", className = "", ...props }: ButtonLinkProps) {
   return <Link className={`${base} ${linkVariants[variant]} ${className}`} {...props} />;
