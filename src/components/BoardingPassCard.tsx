@@ -1,3 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, type MouseEvent } from "react";
 import { Card, CardLink } from "./Card";
 import { NewBadge } from "./NewBadge";
 import { RunwayProgress } from "./RunwayProgress";
@@ -15,6 +19,9 @@ type BoardingPassCardProps = {
   // Second link, shown with new items: opens the list ready to add one.
   forgotHref?: string;
 };
+
+// How long the plane takes to run to the end of the runway before the trip opens.
+const TAKEOFF_MS = 350;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -43,6 +50,20 @@ export function BoardingPassCard({
   href,
   forgotHref,
 }: BoardingPassCardProps) {
+  const router = useRouter();
+  const [departing, setDeparting] = useState(false);
+
+  // "Despegue": a plain click runs the plane down the runway, then opens the trip.
+  // Clicks for a new tab or window, and reduced motion, open straight away.
+  const takeOff = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    event.preventDefault();
+    if (departing) return;
+    setDeparting(true);
+    setTimeout(() => router.push(href), TAKEOFF_MS);
+  };
+
   return (
     <Card interactive padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
@@ -52,7 +73,9 @@ export function BoardingPassCard({
             {code}
           </span>
           <h2 className="font-display text-3xl leading-tight font-semibold uppercase tracking-wide break-words text-ink @md:text-4xl">
-            <CardLink href={href}>{name}</CardLink>
+            <CardLink href={href} onClick={takeOff}>
+              {name}
+            </CardLink>
           </h2>
           {newCount > 0 && (
             <span>
@@ -77,7 +100,7 @@ export function BoardingPassCard({
         </div>
 
         <div className="flex flex-col justify-center gap-2 rounded-b-[3px] bg-canvas/60 p-4 @md:w-64 @md:rounded-r-[3px] @md:rounded-bl-none @md:p-5">
-          <RunwayProgress packed={packed} total={total} />
+          <RunwayProgress packed={packed} total={total} departing={departing} />
           {lastPackedAt && (
             <p className="font-mono text-xs uppercase tracking-wider text-muted">
               Last packed {formatDay(lastPackedAt)}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 type CardProps = {
   // Interactive cards contain a CardLink covering the whole card; hover, focus
@@ -27,10 +27,13 @@ export function Card({ interactive = false, padded = true, className = "", child
 // The card's main link. Its ::after stretches over the whole card, so the card is
 // one big hit area without wrapping it in a link. A second link inside the card
 // needs "relative z-20" to sit above this one.
-export function CardLink({ href, children }: { href: string; children: ReactNode }) {
+type CardLinkProps = { href: string; onClick?: (event: MouseEvent<HTMLAnchorElement>) => void; children: ReactNode };
+
+export function CardLink({ href, onClick, children }: CardLinkProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       data-card-link
       className="decoration-2 underline-offset-4 group-hover:underline focus-visible:outline-none after:absolute after:inset-0 after:z-10 after:content-['']"
     >
