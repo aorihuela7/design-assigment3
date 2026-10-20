@@ -47,7 +47,8 @@ export function BoardingPassCard({
     <Card interactive padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-1 p-4 @md:p-5">
-          <span aria-hidden="true" className="font-mono text-xs tracking-widest text-muted">
+          {/* Decorative ticket detail; the list name is the text that matters. */}
+          <span aria-hidden="true" className="font-mono text-[0.625rem] leading-none tracking-widest text-muted">
             {code}
           </span>
           <h2 className="font-display text-3xl leading-tight font-semibold uppercase tracking-wide break-words text-ink @md:text-4xl">
