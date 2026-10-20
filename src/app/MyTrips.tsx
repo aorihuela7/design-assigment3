@@ -84,8 +84,6 @@ export function MyTrips() {
         <Notice>Your last change wasn’t saved because this browser’s storage is full.</Notice>
       )}
 
-      {isUntouchedStarters(trips) && <p className="-mt-2 text-muted">Starter lists. Open one, make it yours.</p>}
-
       {trips.length === 0 ? (
         // Only after the person deleted every list; starters never come back on their own.
         <Card className="flex flex-col gap-4">
@@ -99,6 +97,14 @@ export function MyTrips() {
         </Card>
       ) : (
         <>
+          {/* The primary action stays at the top, beside the intro on wide screens. */}
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {isUntouchedStarters(trips) && <p className="text-muted">Starter lists. Open one, make it yours.</p>}
+            <ButtonLink variant="primary" href="/trips/new" className="sm:ml-auto">
+              New trip type
+            </ButtonLink>
+          </div>
+
           <ul className="flex flex-col gap-4">
             {[...trips].sort(newestFirst).map((trip) => (
               <li key={trip.id}>
@@ -114,12 +120,6 @@ export function MyTrips() {
               </li>
             ))}
           </ul>
-
-          <div>
-            <ButtonLink variant="primary" href="/trips/new">
-              New trip type
-            </ButtonLink>
-          </div>
         </>
       )}
 
