@@ -102,15 +102,16 @@ export function PackingList() {
   };
   const focusCount = () => requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
   const clearTicks = () => {
-    saveItems(untickAll(trip.items));
+    saveData(withItems(data, tripId, untickAll(trip.items), { ticksClearedAt: new Date().toISOString() }));
     setAnnouncement("Ticks cleared");
     focusCount();
   };
   // Both answers to "Packing for a new trip?" record the answer, so it isn't asked again
   // until the next full pack.
   const answerNewTrip = (clear: boolean) => {
-    const promptDismissedAt = new Date().toISOString();
-    saveData(withItems(data, tripId, clear ? untickAll(trip.items) : trip.items, { promptDismissedAt }));
+    const now = new Date().toISOString();
+    const changes = clear ? { promptDismissedAt: now, ticksClearedAt: now } : { promptDismissedAt: now };
+    saveData(withItems(data, tripId, clear ? untickAll(trip.items) : trip.items, changes));
     if (clear) setAnnouncement("Ticks cleared");
     focusCount();
   };

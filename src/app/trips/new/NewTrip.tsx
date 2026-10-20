@@ -57,7 +57,7 @@ export function NewTrip() {
     }
     const clean = cleanName(name);
     const id = createId();
-    const trip = { id, name: clean, items: [], lastPackedAt: null, promptDismissedAt: null, updatedAt: new Date().toISOString() };
+    const trip = { id, name: clean, items: [], lastPackedAt: null, promptDismissedAt: null, ticksClearedAt: null, updatedAt: new Date().toISOString() };
     saveData({ ...storage.data, trips: [...storage.data.trips, trip] });
     // The empty list focuses its Add item field.
     router.push(`/trips/${id}`);

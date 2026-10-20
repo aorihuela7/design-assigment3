@@ -76,6 +76,7 @@ export function createStarterTrips(now = Date.now()): Trip[] {
     })),
     lastPackedAt: null,
     promptDismissedAt: null,
+    ticksClearedAt: null,
     // One millisecond apart, so the order above survives the newest-first sort.
     updatedAt: new Date(now - index).toISOString(),
   }));

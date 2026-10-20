@@ -30,6 +30,7 @@ export type Trip = {
   items: Item[];
   lastPackedAt: string | null; // set when every item is ticked
   promptDismissedAt: string | null; // "Keep them" pressed on the new-trip prompt
+  ticksClearedAt: string | null; // ticks cleared for a new trip; missing in older data
   updatedAt: string; // sorts My trips
 };
 
@@ -112,6 +113,7 @@ function parseTrip(value: unknown): { trip: Trip; dropped: number } | null {
       items,
       lastPackedAt,
       promptDismissedAt: isDate(value.promptDismissedAt) ? value.promptDismissedAt : null,
+      ticksClearedAt: isDate(value.ticksClearedAt) ? value.ticksClearedAt : null,
       updatedAt: isDate(value.updatedAt) ? value.updatedAt : (lastPackedAt ?? new Date(0).toISOString()),
     },
     dropped: value.items.length - items.length,

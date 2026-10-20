@@ -19,14 +19,21 @@ export function isAllPacked(items: Item[]) {
   return items.length > 0 && items.every((item) => item.packed);
 }
 
+// A full pack after the ticks were cleared is a new trip's: only then do the New
+// marks (things forgotten last time) clear. Re-ticking within the same trip keeps them.
+function isNewTripPack(trip: Trip) {
+  if (!trip.ticksClearedAt) return false;
+  return !trip.lastPackedAt || Date.parse(trip.ticksClearedAt) > Date.parse(trip.lastPackedAt);
+}
+
 // Replaces one trip's items and stamps updatedAt, ready to save. On the change that
-// makes the list fully packed (not on page loads), it also records lastPackedAt and
-// clears the New marks.
+// makes the list fully packed (not on page loads), it also records lastPackedAt and,
+// for a new trip, clears the New marks.
 export function withItems(
   data: StoredData,
   tripId: string,
   items: Item[],
-  changes: Partial<Pick<Trip, "promptDismissedAt">> = {},
+  changes: Partial<Pick<Trip, "promptDismissedAt" | "ticksClearedAt">> = {},
 ): StoredData {
   const now = new Date().toISOString();
   return {
@@ -37,7 +44,7 @@ export function withItems(
       if (!isAllPacked(trip.items) && isAllPacked(items)) {
         return {
           ...trip,
-          items: items.map((item) => ({ ...item, isNew: false })),
+          items: isNewTripPack(trip) ? items.map((item) => ({ ...item, isNew: false })) : items,
           lastPackedAt: now,
           updatedAt: now,
         };
