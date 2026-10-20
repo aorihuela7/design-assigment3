@@ -5,56 +5,51 @@ First visit → main task → coming back. Routes: `/` My trips, `/trips/new` Ne
 ```mermaid
 flowchart TD
   subgraph first["First visit"]
-    Open(["Open Pack Again"]) --> Loading["Loading your lists…<br/>same on server and first render"]
-    Loading --> Read{"Read pack-again:v1"}
-    Read -- "Key missing" --> Seed["Create 3 starter lists<br/>Weekend at parents', Conference trip, Beach weekend"]
-    Read -- "Storage blocked" --> Banner["Banner: this browser isn't saving"]
-    Banner --> Seed
-    Read -- "Unreadable" --> Backup["Copy raw data to pack-again:backup<br/>Notice: we kept a copy and started fresh"]
+    direction TB
+    A1(["Open Pack Again"]) --> A2["Loading your lists…"]
+    A2 --> A3{"Lists saved in<br/>this browser?"}
+    A3 -- "None yet" --> A4["3 starter lists appear<br/>nothing asked first"]
+    A3 -- "Yes" --> A7
+    A3 -- "Can't read them" --> A5["Copy kept, start fresh<br/>No lists yet · Add the starter lists back"]
+    A3 -- "Browser not saving" --> A6["Lists work, with a banner:<br/>this browser isn't saving"]
+    A4 --> A7["My trips<br/>ticket cards, newest first"]
   end
-
-  Read -- "Valid" --> Home
-  Seed --> Home
-  Backup --> NoLists
-
-  Home["/ My trips<br/>cards sorted by last used<br/>progress · last packed · N new since last trip"]
-  Home -- "Deleted every list" --> NoLists["No lists yet<br/>New trip type · Add the starter lists back"]
-  NoLists --> Home
 
   subgraph main["Main task"]
-    NewTrip["/trips/new<br/>Name field"]
-    NewTrip -- "Enter a name · already exists · too long" --> NewTrip
-    NewTrip -- "Saved" --> EmptyList["Empty list<br/>Add item field focused"]
-    EmptyList -- "Add first item" --> Packing
-
-    Exists{"List exists?"}
-    Exists -- "No" --> NotFound["This list doesn't exist anymore<br/>Back to My trips"]
-    Exists -- "Yes" --> Gap{"Fully packed more<br/>than 2 days ago?"}
-    Gap -- "No" --> Packing["Packing<br/>sections: Clothes, Toiletries, Tech, Documents, Other<br/>7 of 15 packed"]
-    Packing -- "Tick / untick · remove item · Clear all ticks" --> Packing
-    Packing -- "Add item: name + section<br/>Enter an item name · already in section · too long" --> Packing
-    Packing -- "Every item ticked" --> AllPacked["All packed. Have a good trip.<br/>save lastPackedAt · clear New marks"]
+    direction TB
+    B1["My trips"] -- "Open a card" --> B3["Packing list<br/>sticky bar: count and plane"]
+    B1 -- "New trip type" --> B2["Trip name<br/>empty · duplicate · too long"]
+    B2 -- "Create list" --> B3
+    B3 -- "Add item" --> B4["Added X to Section<br/>or an error under the field"]
+    B4 --> B3
+    B3 -- "Remove" --> B5["Removed X · Undo"]
+    B5 --> B3
+    B3 -- "Tick every item" --> B6["All packed. Have a good trip."]
+    B6 -- "Forgot something?" --> B7["Saved as packed and New,<br/>for next time"]
+    B8(["Old or wrong link"]) --> B9["List not found<br/>Back to My trips"]
   end
-
-  Home -- "New trip type" --> NewTrip
-  Home -- "Open a card" --> Exists
-  NotFound --> Home
 
   subgraph back["Coming back"]
-    AllPacked -- "Forgot something? Add it for next time" --> Forgot["Item saved and marked New"]
-    Forgot --> AllPacked
-    Return(["Come back before the next trip"]) --> Loading
-    Gap -- "Yes" --> Prompt["Packing for a new trip?<br/>Clear ticks · Keep them"]
-    Prompt -- "Clear ticks<br/>New items shown first in their section" --> Packing
-    Prompt -- "Keep them" --> AllPacked
+    direction TB
+    C1(["Come back before the next trip"]) --> C2["My trips<br/>Last packed · N new since last trip"]
+    C2 -- "After 2+ days away" --> C3["Welcome back.<br/>N lists ready to pack again."]
+    C2 -- "Forgot something? Add it" --> C7["List opens with<br/>Add item focused"]
+    C2 -- "Open the list" --> C4{"Packed over 2 days ago<br/>and still ticked?"}
+    C4 -- "Yes" --> C5["Packing for a new trip?<br/>Clear ticks · Keep them"]
+    C4 -- "No" --> C8["The list as you left it"]
+    C5 -- "Clear ticks" --> C6["Ready to pack again<br/>New items listed first"]
+    C5 -- "Keep them" --> C8
   end
 
-  AllPacked -- "Back to My trips" --> Home
+  %% Invisible links stack the three flows top to bottom.
+  first ~~~ main
+  main ~~~ back
 ```
 
 ## Notes
 
 - Starter lists are created only when the key is missing, never over unreadable data.
-- An item added from "Forgot something?" is saved as already packed, so the list stays "All packed" for the trip you just took. It shows as New until the list is fully packed again.
+- An item added from "Forgot something?" is saved as already packed, so the list stays "All packed" for the trip you just took. It stays New until the next trip is packed: after the ticks are cleared, not when items are re-ticked within the same trip.
 - The "new trip?" prompt depends on today's date, so it is decided only after the page mounts.
 - The Add item section starts on the last section picked on that page (not stored).
+- Removing an item is immediate, with Undo in the progress bar until the next change.
