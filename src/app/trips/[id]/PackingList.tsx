@@ -9,7 +9,8 @@ import { Page } from "@/components/Page";
 import { RunwayProgress } from "@/components/RunwayProgress";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
-import { groupBySection, isAllPacked, untickAll, withItems } from "@/lib/trips";
+import { groupBySection, isAllPacked, shouldAskNewTrip, untickAll, withItems } from "@/lib/trips";
+import { useNow } from "@/lib/useNow";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow } from "./ItemRow";
@@ -19,6 +20,7 @@ const COUNT_ID = "packed-count";
 export function PackingList() {
   const { id } = useParams<{ id: string }>();
   const storage = useStorage();
+  const now = useNow();
   const inputRef = useRef<HTMLInputElement>(null);
   // Read out by screen readers after adding or removing.
   const [announcement, setAnnouncement] = useState("");
@@ -86,10 +88,19 @@ export function PackingList() {
     setAnnouncement(`Removed ${removed.name}`);
     requestAnimationFrame(() => (next ? document.getElementById(`item-${next.id}`) : inputRef.current)?.focus());
   };
+  const focusCount = () => requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
   const clearTicks = () => {
     saveItems(untickAll(trip.items));
     setAnnouncement("Ticks cleared");
-    requestAnimationFrame(() => document.getElementById(COUNT_ID)?.focus());
+    focusCount();
+  };
+  // Both answers to "Packing for a new trip?" record the answer, so it isn't asked again
+  // until the next full pack.
+  const answerNewTrip = (clear: boolean) => {
+    const promptDismissedAt = new Date().toISOString();
+    saveData(withItems(data, tripId, clear ? untickAll(trip.items) : trip.items, { promptDismissedAt }));
+    if (clear) setAnnouncement("Ticks cleared");
+    focusCount();
   };
   const packed = trip.items.filter((item) => item.packed).length;
 
@@ -110,6 +121,21 @@ export function PackingList() {
       <p aria-live="polite" className="sr-only">
         {announcement}
       </p>
+
+      {/* In the page, not a modal, and it never takes focus on load. */}
+      {now !== null && shouldAskNewTrip(trip, now) && (
+        <section role="region" aria-labelledby="new-trip-heading">
+          <Card className="flex flex-col gap-4">
+            <h2 id="new-trip-heading" className="font-display text-2xl font-semibold uppercase tracking-wide">
+              Packing for a new trip?
+            </h2>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button onClick={() => answerNewTrip(true)}>Clear ticks</Button>
+              <Button onClick={() => answerNewTrip(false)}>Keep them</Button>
+            </div>
+          </Card>
+        </section>
+      )}
 
       <AddItemForm items={trip.items} onAdd={add} inputRef={inputRef} forgotMode={allPacked} />
 

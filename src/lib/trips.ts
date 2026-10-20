@@ -71,3 +71,15 @@ export function itemNameError(name: string, items: Item[]): string | null {
 export function untickAll(items: Item[]): Item[] {
   return items.map((item) => ({ ...item, packed: false }));
 }
+
+export const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
+
+// "Packing for a new trip?": packed over 2 days ago, some ticks still on, and not
+// answered since that pack.
+export function shouldAskNewTrip(trip: Trip, now: number) {
+  if (!trip.lastPackedAt) return false;
+  const lastPacked = Date.parse(trip.lastPackedAt);
+  if (now - lastPacked <= TWO_DAYS) return false;
+  if (!trip.items.some((item) => item.packed)) return false;
+  return !trip.promptDismissedAt || Date.parse(trip.promptDismissedAt) < lastPacked;
+}
