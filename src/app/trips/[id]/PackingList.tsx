@@ -135,6 +135,11 @@ export function PackingList() {
         total={trip.items.length}
         countId={COUNT_ID}
         allPacked={allPacked}
+        onForgot={() => {
+          // Centered, so the sticky bar doesn't cover the field.
+          inputRef.current?.scrollIntoView({ block: "center" });
+          inputRef.current?.focus({ preventScroll: true });
+        }}
         message={
           feedback?.text && (
             <>
