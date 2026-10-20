@@ -35,10 +35,10 @@ export function BoardingPassCard({ name, code, packed, total, lastPackedAt, newC
     <Card interactive={Boolean(href)} padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-1 p-4 @md:p-5">
-          <span aria-hidden="true" className="font-mono text-3xl leading-none tracking-widest text-ink">
+          <span aria-hidden="true" className="font-mono text-xs tracking-widest text-muted">
             {code}
           </span>
-          <h2 className="font-display text-2xl leading-tight font-semibold uppercase tracking-wide break-words text-ink">
+          <h2 className="font-display text-3xl leading-tight font-semibold uppercase tracking-wide break-words text-ink @md:text-4xl">
             {href ? <CardLink href={href}>{name}</CardLink> : name}
           </h2>
           {newCount > 0 && (
