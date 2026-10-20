@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { useId, type ComponentProps, type ReactNode } from "react";
 
 type FieldProps = {
   id: string;
@@ -45,7 +45,8 @@ function describedBy(id: string, error: string | undefined, own: string | undefi
   return [own, error ? `${id}-error` : undefined].filter(Boolean).join(" ") || undefined;
 }
 
-type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
+// ComponentProps includes ref, which React 19 passes through like any prop.
+type TextFieldProps = Omit<ComponentProps<"input">, "id"> & {
   label: string;
   error?: string;
 };
@@ -66,7 +67,7 @@ export function TextField({ label, error, type = "text", className = "", ...prop
   );
 }
 
-type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "id"> & {
+type SelectFieldProps = Omit<ComponentProps<"select">, "id"> & {
   label: string;
   error?: string;
   options: { value: string; label: string }[];

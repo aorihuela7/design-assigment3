@@ -23,3 +23,23 @@ export function withItems(data: StoredData, tripId: string, items: Item[]): Stor
     trips: data.trips.map((trip) => (trip.id === tripId ? { ...trip, items, updatedAt: now } : trip)),
   };
 }
+
+export const MAX_ITEM_NAME = 60;
+
+// Trims and collapses inner spaces: "  Phone   charger " → "Phone charger".
+export function cleanName(name: string) {
+  return name.trim().replace(/\s+/g, " ");
+}
+
+// Returns what to do next, or null when the name can be added.
+export function itemNameError(name: string, items: Item[]): string | null {
+  const clean = cleanName(name);
+  if (clean === "") return "Enter an item name";
+  if (clean.length > MAX_ITEM_NAME) return `Keep it under ${MAX_ITEM_NAME} characters`;
+  const existing = items.find((item) => cleanName(item.name).toLowerCase() === clean.toLowerCase());
+  if (existing) {
+    const section = SECTIONS.find((s) => s.value === existing.section)?.label ?? "Other";
+    return `${existing.name} is already in ${section}`;
+  }
+  return null;
+}
