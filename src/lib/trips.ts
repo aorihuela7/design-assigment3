@@ -15,12 +15,29 @@ export function groupBySection(items: Item[]): SectionGroup[] {
   }).filter((group) => group.items.length > 0);
 }
 
-// Replaces one trip's items and stamps updatedAt, ready to save.
+export function isAllPacked(items: Item[]) {
+  return items.length > 0 && items.every((item) => item.packed);
+}
+
+// Replaces one trip's items and stamps updatedAt, ready to save. On the change that
+// makes the list fully packed (not on page loads), it also records lastPackedAt and
+// clears the New marks.
 export function withItems(data: StoredData, tripId: string, items: Item[]): StoredData {
   const now = new Date().toISOString();
   return {
     ...data,
-    trips: data.trips.map((trip) => (trip.id === tripId ? { ...trip, items, updatedAt: now } : trip)),
+    trips: data.trips.map((trip) => {
+      if (trip.id !== tripId) return trip;
+      if (!isAllPacked(trip.items) && isAllPacked(items)) {
+        return {
+          ...trip,
+          items: items.map((item) => ({ ...item, isNew: false })),
+          lastPackedAt: now,
+          updatedAt: now,
+        };
+      }
+      return { ...trip, items, updatedAt: now };
+    }),
   };
 }
 

@@ -3,11 +3,12 @@
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/Card";
+import { Notice } from "@/components/Notice";
 import { Page } from "@/components/Page";
 import { RunwayProgress } from "@/components/RunwayProgress";
 import { StorageNotice } from "@/components/StorageNotice";
 import { createId, saveData, useStorage, type Item, type Section } from "@/lib/storage";
-import { groupBySection, withItems } from "@/lib/trips";
+import { groupBySection, isAllPacked, withItems } from "@/lib/trips";
 import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow } from "./ItemRow";
@@ -79,7 +80,17 @@ export function PackingList() {
 
   return (
     <Page title={trip.name} back={BACK_TO_MY_TRIPS}>
-      <RunwayProgress packed={packed} total={trip.items.length} />
+      <div>
+        <RunwayProgress packed={packed} total={trip.items.length} />
+        {/* Always rendered, so the message is announced when it appears. Inside the page, not a modal. */}
+        <div role="status">
+          {isAllPacked(trip.items) && (
+            <div className="mt-4">
+              <Notice live={false}>All packed. Have a good trip.</Notice>
+            </div>
+          )}
+        </div>
+      </div>
       <StorageNotice problem={storage.problem} />
       <p aria-live="polite" className="sr-only">
         {announcement}
