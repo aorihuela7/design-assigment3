@@ -3,11 +3,12 @@
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { Card } from "@/components/Card";
-import { NewBadge } from "@/components/NewBadge";
 import { Page } from "@/components/Page";
+import { RunwayProgress } from "@/components/RunwayProgress";
 import { StorageNotice } from "@/components/StorageNotice";
-import { useStorage } from "@/lib/storage";
-import { groupBySection } from "@/lib/trips";
+import { saveData, useStorage, type Item } from "@/lib/storage";
+import { groupBySection, withItems } from "@/lib/trips";
+import { ItemRow } from "./ItemRow";
 
 const BACK = { href: "/", label: "Back to My trips" };
 
@@ -22,13 +23,22 @@ export function PackingList() {
     if (name) document.title = `${name} · Pack Again`;
   }, [name]);
 
-  if (!trip) {
+  if (storage.status === "loading" || !storage.data || !trip) {
     return <Page title="Packing list" back={BACK}>{null}</Page>;
   }
 
+  const { data } = storage;
+  const tripId = trip.id;
+  // Every change is saved straight away.
+  const saveItems = (items: Item[]) => saveData(withItems(data, tripId, items));
+  const toggle = (id: string) =>
+    saveItems(trip.items.map((item) => (item.id === id ? { ...item, packed: !item.packed } : item)));
+  const packed = trip.items.filter((item) => item.packed).length;
+
   return (
     <Page title={trip.name} back={BACK}>
-      {storage.status === "ready" && <StorageNotice problem={storage.problem} />}
+      <RunwayProgress packed={packed} total={trip.items.length} />
+      <StorageNotice problem={storage.problem} />
 
       {groupBySection(trip.items).map((group) => (
         <section key={group.section} aria-labelledby={`section-${group.section}`} className="flex flex-col gap-2">
@@ -38,10 +48,7 @@ export function PackingList() {
           <Card padded={false}>
             <ul className="divide-y divide-line">
               {group.items.map((item) => (
-                <li key={item.id} className="flex min-h-11 items-center gap-3 px-4 py-2">
-                  <span className="min-w-0 flex-1 wrap-anywhere">{item.name}</span>
-                  {item.isNew && <NewBadge />}
-                </li>
+                <ItemRow key={item.id} item={item} onToggle={() => toggle(item.id)} />
               ))}
             </ul>
           </Card>

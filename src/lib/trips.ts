@@ -1,4 +1,4 @@
-import { SECTIONS, type Item, type Section } from "./storage";
+import { SECTIONS, type Item, type Section, type StoredData } from "./storage";
 
 export type SectionGroup = { section: Section; label: string; items: Item[] };
 
@@ -13,4 +13,13 @@ export function groupBySection(items: Item[]): SectionGroup[] {
       items: [...inSection.filter((item) => item.isNew), ...inSection.filter((item) => !item.isNew)],
     };
   }).filter((group) => group.items.length > 0);
+}
+
+// Replaces one trip's items and stamps updatedAt, ready to save.
+export function withItems(data: StoredData, tripId: string, items: Item[]): StoredData {
+  const now = new Date().toISOString();
+  return {
+    ...data,
+    trips: data.trips.map((trip) => (trip.id === tripId ? { ...trip, items, updatedAt: now } : trip)),
+  };
 }
