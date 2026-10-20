@@ -109,6 +109,7 @@ export function MyTrips() {
                   lastPackedAt={trip.lastPackedAt}
                   newCount={trip.items.filter((item) => item.isNew).length}
                   href={`/trips/${trip.id}`}
+                  forgotHref={`/trips/${trip.id}?add=1`}
                 />
               </li>
             ))}

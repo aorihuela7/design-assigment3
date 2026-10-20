@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardLink } from "./Card";
 import { NewBadge } from "./NewBadge";
 import { RunwayProgress } from "./RunwayProgress";
@@ -11,6 +12,8 @@ type BoardingPassCardProps = {
   newCount?: number;
   // The list name links here; the link's hit area covers the whole card.
   href?: string;
+  // Second link, shown with new items: opens the list ready to add one.
+  forgotHref?: string;
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -30,7 +33,16 @@ const notchStart =
 const notchEnd =
   "-right-px top-0 translate-x-1/2 -translate-y-1/2 border-b-current border-l-current @md:right-auto @md:left-0 @md:top-auto @md:-bottom-px @md:-translate-x-1/2 @md:translate-y-1/2 @md:border-b-transparent @md:border-t-current";
 
-export function BoardingPassCard({ name, code, packed, total, lastPackedAt, newCount = 0, href }: BoardingPassCardProps) {
+export function BoardingPassCard({
+  name,
+  code,
+  packed,
+  total,
+  lastPackedAt,
+  newCount = 0,
+  href,
+  forgotHref,
+}: BoardingPassCardProps) {
   return (
     <Card interactive={Boolean(href)} padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
@@ -43,8 +55,17 @@ export function BoardingPassCard({ name, code, packed, total, lastPackedAt, newC
           </h2>
           {newCount > 0 && (
             <span>
-              <NewBadge>{`${newCount} new`}</NewBadge>
+              <NewBadge>{`${newCount} new since last trip`}</NewBadge>
             </span>
+          )}
+          {newCount > 0 && forgotHref && (
+            // A sibling of the main link, never inside it; z-20 lifts it above the card-wide hit area.
+            <Link
+              href={forgotHref}
+              className="relative z-20 inline-flex min-h-11 items-center self-start rounded font-mono text-xs uppercase tracking-wider text-ink underline underline-offset-4 hover:decoration-2 active:text-muted"
+            >
+              Forgot something? Add it<span className="sr-only"> to {name}</span>
+            </Link>
           )}
         </div>
 

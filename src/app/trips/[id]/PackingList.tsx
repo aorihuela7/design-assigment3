@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/Card";
 import { Notice } from "@/components/Notice";
@@ -28,11 +28,14 @@ export function PackingList() {
     if (tabTitle) document.title = `${tabTitle} · Pack Again`;
   }, [tabTitle]);
 
-  // An empty list opens ready to type the first item.
+  // Opens ready to type when the list is empty, or when asked with ?add=1
+  // ("Forgot something? Add it" on My trips).
+  const wantsAdd = useSearchParams().get("add") === "1";
   const isEmpty = trip?.items.length === 0;
+  const hasTrip = Boolean(trip);
   useEffect(() => {
-    if (isEmpty) inputRef.current?.focus();
-  }, [isEmpty]);
+    if (hasTrip && (isEmpty || wantsAdd)) inputRef.current?.focus();
+  }, [hasTrip, isEmpty, wantsAdd]);
 
   if (storage.status === "loading") return <ListLoading />;
 
