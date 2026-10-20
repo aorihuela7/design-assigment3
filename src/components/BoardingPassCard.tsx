@@ -3,6 +3,7 @@ import { NewBadge } from "./NewBadge";
 
 type BoardingPassCardProps = {
   name: string;
+  code: string; // from uniqueCodes(), so it's unique among the person's lists
   packed: number;
   total: number;
   lastPackedAt: string | null;
@@ -11,27 +12,6 @@ type BoardingPassCardProps = {
 };
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-const FILLER_WORDS = new Set(["A", "AN", "AND", "AT", "FOR", "IN", "OF", "ON", "THE", "TO"]);
-
-// "Beach weekend" → "BEW", "Weekend at parents'" → "WEP", "Lisbon" → "LIS".
-export function tripCode(name: string) {
-  const words = name
-    .normalize("NFD")
-    .toUpperCase()
-    .replace(/[^A-Z\s]/g, "")
-    .split(/\s+/)
-    .filter(Boolean);
-  const kept = words.filter((word) => !FILLER_WORDS.has(word));
-  const w = kept.length > 0 ? kept : words;
-  const code =
-    w.length >= 3
-      ? w.slice(0, 3).map((word) => word[0]).join("")
-      : w.length === 2
-        ? w[0].slice(0, 2) + w[1][0]
-        : (w[0] ?? "").slice(0, 3);
-  return code.padEnd(3, "X");
-}
-
 // "12 OCT". Only called after mount, so the user's time zone is safe to use.
 function formatDay(iso: string) {
   const date = new Date(iso);
@@ -47,14 +27,14 @@ const notchStart =
 const notchEnd =
   "-right-px top-0 translate-x-1/2 -translate-y-1/2 border-b-current border-l-current @md:right-auto @md:left-0 @md:top-auto @md:-bottom-px @md:-translate-x-1/2 @md:translate-y-1/2 @md:border-b-transparent @md:border-t-current";
 
-export function BoardingPassCard({ name, packed, total, lastPackedAt, newCount = 0, href }: BoardingPassCardProps) {
+export function BoardingPassCard({ name, code, packed, total, lastPackedAt, newCount = 0, href }: BoardingPassCardProps) {
   const notchColor = href ? "text-line group-hover:text-ink" : "text-line";
   return (
     <Card href={href} padded={false} className="@container">
       <div className="relative flex flex-col @md:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-1 p-4 @md:p-5">
           <span aria-hidden="true" className="font-mono text-3xl leading-none tracking-widest text-ink">
-            {tripCode(name)}
+            {code}
           </span>
           <h2 className="font-display text-2xl leading-tight font-semibold uppercase tracking-wide break-words text-ink">
             {name}

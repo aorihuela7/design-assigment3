@@ -146,8 +146,9 @@ export function ThemePreview() {
       </Section>
 
       <Section title="BoardingPassCard" note="Links: hover, Tab and press. The stub moves below when the card is narrower than 28rem.">
-        <BoardingPassCard name="Beach weekend" packed={7} total={15} lastPackedAt="2026-10-12T10:00:00Z" href="/dev/theme" />
+        <BoardingPassCard code="BEW" name="Beach weekend" packed={7} total={15} lastPackedAt="2026-10-12T10:00:00Z" href="/dev/theme" />
         <BoardingPassCard
+          code="COT"
           name="Conference trip"
           packed={18}
           total={18}
@@ -155,14 +156,15 @@ export function ThemePreview() {
           newCount={2}
           href="/dev/theme"
         />
-        <BoardingPassCard name="Weekend at parents'" packed={0} total={12} lastPackedAt={null} href="/dev/theme" />
-        <BoardingPassCard name="Static, not a link" packed={3} total={9} lastPackedAt={null} />
+        <BoardingPassCard code="WEP" name="Weekend at parents'" packed={0} total={12} lastPackedAt={null} href="/dev/theme" />
+        <BoardingPassCard code="SNL" name="Static, not a link" packed={3} total={9} lastPackedAt={null} />
         <Label>Narrow (stub below)</Label>
         <div className="max-w-xs">
-          <BoardingPassCard name="Beach weekend" packed={7} total={15} lastPackedAt="2026-10-12T10:00:00Z" href="/dev/theme" />
+          <BoardingPassCard code="BEW" name="Beach weekend" packed={7} total={15} lastPackedAt="2026-10-12T10:00:00Z" href="/dev/theme" />
         </div>
         <div className="max-w-xs">
           <BoardingPassCard
+            code="VLT"
             name="A very long trip type name that wraps"
             packed={0}
             total={0}
