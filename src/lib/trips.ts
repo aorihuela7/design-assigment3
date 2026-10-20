@@ -69,7 +69,7 @@ export function itemNameError(name: string, items: Item[]): string | null {
   const existing = items.find((item) => cleanName(item.name).toLowerCase() === clean.toLowerCase());
   if (existing) {
     const section = SECTIONS.find((s) => s.value === existing.section)?.label ?? "Other";
-    return `${existing.name} is already in ${section}`;
+    return `${existing.name} is already in ${section}. Tick it there or use another name`;
   }
   return null;
 }

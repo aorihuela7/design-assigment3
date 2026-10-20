@@ -20,20 +20,21 @@ export function AddItemForm({ items, onAdd, inputRef, forgotMode }: AddItemFormP
   const [name, setName] = useState("");
   // Last section picked on this page; Clothes on arrival. Not saved.
   const [section, setSection] = useState<Section>("clothes");
-  // No errors before the first submit; after it, the error follows what's typed.
-  const [attempted, setAttempted] = useState(false);
-  const error = attempted ? itemNameError(name, items) : null;
+  // No errors before the first submit; after it, the error follows what's typed. It
+  // belongs to the mode it was made in, so switching to "Forgot something?" clears it.
+  const [attemptedIn, setAttemptedIn] = useState<boolean | null>(null);
+  const error = attemptedIn === forgotMode ? itemNameError(name, items) : null;
 
   function submit(event: FormEvent) {
     event.preventDefault();
     if (itemNameError(name, items)) {
-      setAttempted(true); // keeps exactly what was typed
+      setAttemptedIn(forgotMode); // keeps exactly what was typed
       inputRef.current?.focus();
       return;
     }
     onAdd(cleanName(name), section);
     setName("");
-    setAttempted(false);
+    setAttemptedIn(null);
     inputRef.current?.focus();
   }
 
@@ -49,6 +50,10 @@ export function AddItemForm({ items, onAdd, inputRef, forgotMode }: AddItemFormP
           autoComplete="off"
           value={name}
           onChange={(event) => setName(event.target.value)}
+          // Leaving an empty field drops its error; nothing is left to fix.
+          onBlur={() => {
+            if (cleanName(name) === "") setAttemptedIn(null);
+          }}
           error={error ?? undefined}
         />
         <SelectField
