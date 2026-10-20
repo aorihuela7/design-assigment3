@@ -13,7 +13,7 @@ export function Page({ title, back, children }: PageProps) {
   return (
     <>
       <Header title={title} />
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6">
+      <main className="mx-auto flex w-full max-w-225 flex-1 flex-col gap-6 px-4 py-6 sm:px-6">
         {back && (
           <div className="-mt-2">
             <BackLink href={back.href}>{back.label}</BackLink>

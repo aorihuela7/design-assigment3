@@ -8,7 +8,7 @@ type HeaderProps = {
 export function Header({ title }: HeaderProps) {
   return (
     <header data-surface="board" className="bg-board text-amber">
-      <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-5 sm:px-6">
+      <div className="mx-auto w-full max-w-225 px-4 pt-3 pb-5 sm:px-6">
         <div className="flex items-center font-mono text-xs uppercase tracking-widest">
           <Link
             href="/"
