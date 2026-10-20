@@ -14,6 +14,7 @@ import { AddItemForm } from "./AddItemForm";
 import { BACK_TO_MY_TRIPS, ListLoading } from "./ListLoading";
 import { ItemRow, RemovedRow, UNDO_ROW_ID } from "./ItemRow";
 import { ProgressBar } from "./ProgressBar";
+import { TripActions } from "./TripActions";
 
 const COUNT_ID = "packed-count";
 export function PackingList() {
@@ -132,6 +133,14 @@ export function PackingList() {
     if (clear) setAnnouncement("Ticks cleared");
     focusCount();
   };
+  const rename = (name: string) => {
+    const updatedAt = new Date().toISOString();
+    updateData((data) => ({
+      ...data,
+      trips: data.trips.map((t) => (t.id === tripId ? { ...t, name, updatedAt } : t)),
+    }));
+    setAnnouncement(`Renamed to ${name}`);
+  };
   const packed = trip.items.filter((item) => item.packed).length;
   // The removed item stays on screen as a placeholder, in its old position.
   const pending = feedback?.undo;
@@ -218,13 +227,13 @@ export function PackingList() {
         </section>
       ))}
 
-      {trip.items.length > 0 && (
-        <div>
-          <Button onClick={clearTicks} disabled={packed === 0}>
-            Clear all ticks
-          </Button>
-        </div>
-      )}
+      <TripActions
+        trip={trip}
+        otherTrips={storage.data.trips.filter((t) => t.id !== tripId)}
+        packed={packed}
+        onClearTicks={clearTicks}
+        onRename={rename}
+      />
     </Page>
   );
 }

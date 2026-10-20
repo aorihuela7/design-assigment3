@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 type Variant = "primary" | "secondary" | "quiet";
 
@@ -22,7 +22,8 @@ const linkVariants = {
   secondary: "border-ink bg-surface text-ink hover:bg-canvas active:bg-line",
 };
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant };
+// ComponentProps includes ref, which React 19 passes through like any prop.
+type ButtonProps = ComponentProps<"button"> & { variant?: Variant };
 
 export function Button({ variant = "secondary", type = "button", className = "", ...props }: ButtonProps) {
   return (

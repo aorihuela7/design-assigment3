@@ -1,34 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button, ButtonLink } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { TextField } from "@/components/Field";
 import { Page } from "@/components/Page";
 import { StorageNotice } from "@/components/StorageNotice";
+import { tripNameMessage } from "@/components/tripNameMessage";
 import { createStarterTrips } from "@/lib/starters";
 import { createId, createIfMissing, updateData, useStorage } from "@/lib/storage";
-import { cleanName, MAX_TRIP_NAME, tripNameProblem, type TripNameProblem } from "@/lib/trips";
-
-function message(problem: TripNameProblem): ReactNode {
-  if (problem.kind === "empty") return "Enter a name, like ‘Beach weekend’";
-  if (problem.kind === "long") return `Keep it under ${MAX_TRIP_NAME} characters`;
-  return (
-    <span>
-      You already have a trip called ‘{problem.trip.name}’.{" "}
-      {/* An invisible ::after makes the tap target 44px tall; the focus ring stays on the text. */}
-      <Link
-        href={`/trips/${problem.trip.id}`}
-        className="relative rounded underline underline-offset-4 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-[''] hover:decoration-2"
-      >
-        Open it
-      </Link>{" "}
-      or choose another name
-    </span>
-  );
-}
+import { cleanName, tripNameProblem } from "@/lib/trips";
 
 export function NewTrip() {
   const router = useRouter();
@@ -73,7 +55,7 @@ export function NewTrip() {
             <TextField
               ref={inputRef}
               label="Trip name"
-              error={nameProblem ? message(nameProblem) : undefined}
+              error={nameProblem ? tripNameMessage(nameProblem) : undefined}
               placeholder="e.g. Beach weekend"
               autoComplete="off"
               value={name}
