@@ -1,4 +1,3 @@
-import type { FocusEvent } from "react";
 import { Button } from "@/components/Button";
 import { NewBadge } from "@/components/NewBadge";
 import type { Item } from "@/lib/storage";
@@ -47,26 +46,14 @@ export function ItemRow({ item, onToggle, onRemove }: ItemRowProps) {
 
 export const UNDO_ROW_ID = "undo-removed-item";
 
-export type UndoHold = (reason: "pointer" | "focus", held: boolean) => void;
-
-// Pointer over it, or keyboard focus on it, holds the Undo; leaving lets it time out.
-export function undoHoldProps(onHold: UndoHold) {
-  return {
-    onPointerEnter: () => onHold("pointer", true),
-    onPointerLeave: () => onHold("pointer", false),
-    // Only keyboard focus holds it: after a mouse click, focus lands here too.
-    onFocus: (event: FocusEvent<HTMLElement>) => onHold("focus", (event.target as HTMLElement).matches(":focus-visible")),
-    onBlur: () => onHold("focus", false),
-  };
-}
-
-// Takes the removed item's place for a few seconds, so Undo is right where the
-// item was, for pointer and keyboard alike.
-export function RemovedRow({ name, onUndo, onHold }: { name: string; onUndo: () => void; onHold: UndoHold }) {
+// Takes the removed item's place until the next change to the list, so Undo is
+// right where the item was, for pointer and keyboard alike.
+export function RemovedRow({ name, onUndo }: { name: string; onUndo: () => void }) {
   return (
-    <li className="flex min-h-11 items-center gap-3 px-4 py-1 text-muted" {...undoHoldProps(onHold)}>
-      <span className="min-w-0 flex-1 wrap-anywhere">Removed {name}</span>
-      <Button id={UNDO_ROW_ID} aria-label={`Undo removing ${name}`} onClick={onUndo} className="shrink-0">
+    <li className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 px-4 py-1 text-muted">
+      <span className="min-w-0 wrap-anywhere">Removed {name}</span>
+      <span aria-hidden="true">·</span>
+      <Button id={UNDO_ROW_ID} aria-label={`Undo removing ${name}`} onClick={onUndo}>
         Undo
       </Button>
     </li>
