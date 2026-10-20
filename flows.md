@@ -22,7 +22,7 @@ flowchart TD
     B2 -- "Create trip" --> B3
     B3 -- "Add item" --> B4["Added X to Section<br/>or an error under the field"]
     B4 --> B3
-    B3 -- "Remove" --> B5["Removed X · Undo<br/>until the next change"]
+    B3 -- "Remove" --> B5["Removed X · Undo<br/>for 3 s after you move away"]
     B5 --> B3
     B3 -- "Tick every item" --> B6["All packed. Have a good trip."]
     B6 -- "Forgot something?" --> B7["Saved as packed and New,<br/>for next time"]
@@ -57,6 +57,6 @@ flowchart TD
 - An item added from "Forgot something?" is saved as already packed, so the list stays "All packed" for the trip you just took. It stays New until the next trip is packed: after the ticks are cleared, not when items are re-ticked within the same trip.
 - The "new trip?" prompt depends on today's date, so it is decided only after the page mounts.
 - The Add item section starts on the last section picked on that page (not stored).
-- Removing an item is immediate. A "Removed X · Undo" row takes its place, with Undo focused, and stays until the next change to the list; the bar repeats it.
+- Removing an item is immediate. A "Removed X · Undo" row takes its place, with Undo focused; the bar repeats it. Both go 3 seconds after you move away from them (hovering or keyboard focus keeps them), or at the next change. If Undo had focus, focus moves to the next item.
 - Rename trip and Delete trip open in place at the bottom of the list, never as a modal. Escape or Cancel closes them and returns focus. Deleting goes back to My trips, which says "Deleted X" with focus on it.
 - Every change is applied to what's saved at that moment, so open tabs stay in sync (through the storage event) and never overwrite each other.

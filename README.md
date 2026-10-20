@@ -28,7 +28,7 @@ flowchart TD
     B2 -- "Create trip" --> B3
     B3 -- "Add item" --> B4["Added X to Section<br/>or an error under the field"]
     B4 --> B3
-    B3 -- "Remove" --> B5["Removed X · Undo<br/>until the next change"]
+    B3 -- "Remove" --> B5["Removed X · Undo<br/>for 3 s after you move away"]
     B5 --> B3
     B3 -- "Tick every item" --> B6["All packed. Have a good trip."]
     B6 -- "Forgot something?" --> B7["Saved as packed and New,<br/>for next time"]
@@ -94,7 +94,7 @@ An AI agent used the live app twice as a first-time user, judging only from the 
 
 | Problem | Decision | What changed |
 |---|---|---|
-| Permanent removal | Fixed | A "Removed Socks · Undo" row in the item's place, with Undo focused, and the same Undo in the bar. Both stay until your next change to the list. Undo puts the item back and focuses it. |
+| Permanent removal | Fixed | A "Removed Socks · Undo" row in the item's place, with Undo focused, and the same Undo in the bar. Both go 3 seconds after you move away from them (hovering or keyboard focus keeps them), or at your next change. Undo puts the item back and focuses it. |
 | New marks erased | Fixed | New marks clear only when the next trip is packed (after Clear all ticks), not when you re-tick within the same trip. |
 | Success off screen | Fixed | The count, plane and "All packed" sit in a bar that sticks to the top as you scroll. |
 | No add confirmation | Fixed | The bar shows "Added Sunglasses to Other" on screen, not only to screen readers. |
@@ -114,7 +114,7 @@ An AI agent used the live app twice as a first-time user, judging only from the 
 
 An audit against AGENTS.md and the assignment, then the features left out of the plan:
 
-- **Undo has no timer.** An earlier 5-second fade was removed: it could take Undo away from someone slower or using a screen reader. The row stays until the next change.
+- **Undo goes after 3 seconds, but only once you move away.** Hovering it or keeping keyboard focus on it pauses the countdown, so it isn't taken away from someone slower; if it goes while focused, focus moves to the next item.
 - **Rename trip**, in place, with the same checks and messages as New trip. Escape cancels; focus returns to the button.
 - **Delete trip**, with a confirmation in place ("Delete Beach weekend and its 15 items? This can't be undone."), not a modal. Focus goes to the question, so an extra Enter can't delete; afterwards My trips says "Deleted …" and focus lands there.
 - **Tabs stay in sync.** Every change is applied to what's saved at that moment, so two open tabs, or two quick changes, never overwrite each other.
